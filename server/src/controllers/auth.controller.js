@@ -1,6 +1,6 @@
 import { registerUser, logUser } from "../services/auth.service.js";
 
-const signUpUser = async (req, res) => {
+export const signUpUser = async (req, res) => {
   try {
     const data = req.body;
     const result = await registerUser(data);
@@ -14,7 +14,7 @@ const signUpUser = async (req, res) => {
   }
 };
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const data = req.body;
     const result = await logUser(data);
@@ -25,4 +25,4 @@ const loginUser = async (req, res) => {
   }
 };
 
-export { signUpUser, loginUser };
+// export { signUpUser, loginUser };

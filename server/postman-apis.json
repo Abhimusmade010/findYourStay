@@ -30,7 +30,18 @@
           "200": { "description": "Login successful" }
         }
       }
-    }
+    },
+    
+    "/api/hotels": {
+      "get": {
+        "summary": "Get all hotels",
+        "tags": ["Hotels"]
+      },
+      "post": {
+        "summary": "Create hotel (Admin)",
+        "tags": ["Hotels"]
+      }
+    },
 
 }
 }
