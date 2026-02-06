@@ -1,0 +1,36 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Plan My Stay API",
+    "version": "1.0.0",
+    "description": "All backend APIs"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "paths": {
+
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register user",
+        "tags":  ["Auth"],
+        "responses": {
+          "201": { "description": "User registered" }
+        }
+      }
+    },
+
+    "/api/auth/login": {
+      "post": {
+        "summary": "Login user",
+        "tags": ["Auth"],
+        "responses": {
+          "200": { "description": "Login successful" }
+        }
+      }
+    }
+
+}
+}
