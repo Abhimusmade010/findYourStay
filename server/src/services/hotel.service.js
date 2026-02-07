@@ -30,3 +30,17 @@ export const searchForHotel=async(data)=>{
         myhotels
     }
 }
+
+export const fetchHotel=async(data)=>{
+    const hotelId=data;
+
+    const hotel=await Hotel.findById(hotelId);
+    if(!hotel){
+        throw new Error({message:"No Hotel Found"})
+    }
+    return{
+        hotel
+    }
+
+
+}

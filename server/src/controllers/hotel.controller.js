@@ -1,11 +1,12 @@
-import { fetchHotels,searchForHotel} from "../services/hotel.service.js"
+import { fetchHotels,searchForHotel,fetchHotel} from "../services/hotel.service.js"
+
 
 export const getAllHotels = async (req, res) => {
 
   try {
     // const data = req.body;
     const result = await fetchHotels();
-
+    console.log("inside getall hotels",result);
     res.status(200).json({                 //200 because for succes not 201 becuase nothing is creating 
       message: "Hotels fetched",
       result
@@ -16,16 +17,38 @@ export const getAllHotels = async (req, res) => {
 
 };
 
+
+
 export const searchHotel=async(req,res)=>{
 
   try{
     const data= req.body;
+    console.log("Data from the searchh Hotel",data);
     const myhotels=await searchForHotel(data);
-    res.json(myhotels);
+    console.log("Data from teh serahcing ",myhotels);
+    res.status(200).json(myhotels);
   }
   catch(error){
     res.status(500).json({ message: error.message });
   }
-  
+
 }
+
+
+export const getoneHotel=async (req,res)=>{
+  try{
+    const data=req.params.id;
+    const result=await fetchHotel(data);
+    res.status(200).json({
+      message:"Hotels",
+      result
+    })
+  }catch(error){
+    res.status(400).json({
+      error:error.message
+    })
+  }
+}
+
+
 

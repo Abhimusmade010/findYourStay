@@ -9,11 +9,12 @@ const router=express.Router();
 
 console.log("inside the index,js for routes!");
 
+
 router.use("/auth", authRoutes);
 router.use("/hotels", hotelRoutes);
 
-// app.use("/api/bookings", bookingRoutes);
-// app.use("/api/reviews", reviewRoutes);
-// app.use("/api", wishlistRoutes);
+// app.use("/api/bookings",bookingRoutes);
+// app.use("/api/reviews",reviewRoutes);
+// app.use("/api",wishlistRoutes);
 
 export default router
