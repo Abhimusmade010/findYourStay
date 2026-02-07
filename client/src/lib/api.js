@@ -41,17 +41,19 @@ export const authAPI = {
   login: (credentials) => api.post('/auth/login', credentials),
 }
 
+
+
 // Hotels API
 export const hotelsAPI = {
   getAll: () => api.get('/hotels'),
   getById: (id) => api.get(`/hotels/${id}`),
-  search: (searchParams) => api.post('/hotels/search', searchParams),
+  search: (searchParams) => api.post('/hotels/search',searchParams),
   create: (data) => api.post('/hotels', data),
   update: (id, data) => api.put(`/hotels/${id}`, data),
   getMine: () => api.get('/hotels/mine/list'),
 }
 
-// Bookings API
+// Bookings API 
 export const bookingsAPI = {
   create: (bookingData) => api.post('/bookings', bookingData),
   getHistory: () => api.get('/bookings/history'),

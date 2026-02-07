@@ -23,6 +23,7 @@ export default function HotelDetailsPage() {
     queryKey: ['hotel-reviews', id],
     queryFn: async () => (await reviewsAPI.getByHotel(id)).data
   })
+  
 
   const { data: past = [] } = useQuery({
     queryKey: ['bookings', 'history'],

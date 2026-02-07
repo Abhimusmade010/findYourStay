@@ -15,17 +15,26 @@ export default function HotelsPage() {
 
   const { data: hotels = [], isLoading } = useQuery({
     queryKey: ['hotels'],
-    queryFn: async () => (await hotelsAPI.getAll()).data,
-  })
+    queryFn: async () =>{
+      const res=await hotelsAPI.getAll()
+      console.log("inside query fucntion",res);
+      return res.data.result.hotels
+    }
+  }) 
+  console.log("Query fuction",hotels)
+  //till here from backend hotels are fetched and from her onwards filter is applied on fetch data
 
-  const filtered = useMemo(() => {
+  const filtered = useMemo(() =>{
     return hotels.filter(h => {
       const priceOk = (!minPrice || h.pricePerNight >= Number(minPrice)) && (!maxPrice || h.pricePerNight <= Number(maxPrice))
       const cityOk = !city || (h.location?.city || '').toLowerCase().includes(city.toLowerCase())
       return priceOk && cityOk
     })
   }, [hotels, minPrice, maxPrice, city])
-
+  console.log("data of hotels",hotels);
+  console.log("before return function")
+  console.log("After aplying filter",filtered);
+  
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -38,7 +47,8 @@ export default function HotelsPage() {
               <Input placeholder="Min Price" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
               <Input placeholder="Max Price" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
             </div>
-            <Button variant="gradient" onClick={() => setParams({ city })}>Apply</Button>
+            {/* <Button variant="gradient" onClick={() => setParams({city})}>Apply</Button> */}
+            {/* <Button variant="gradient" onClick={() => setParams({ city,maxPrice,minPrice })}>Apply</Button> */}
           </div>
         </div>
 
