@@ -1,5 +1,4 @@
-import { fetchHotels,searchForHotel,fetchHotel} from "../services/hotel.service.js"
-
+import { fetchHotels,searchForHotel,fetchHotel,addHotel} from "../services/hotel.service.js"
 
 export const getAllHotels = async (req, res) => {
 
@@ -17,8 +16,6 @@ export const getAllHotels = async (req, res) => {
 
 };
 
-
-
 export const searchHotel=async(req,res)=>{
 
   try{
@@ -33,7 +30,6 @@ export const searchHotel=async(req,res)=>{
   }
 
 }
-
 
 export const getoneHotel=async (req,res)=>{
   try{
@@ -50,5 +46,26 @@ export const getoneHotel=async (req,res)=>{
   }
 }
 
+export const createHotel=async(req,res)=>{
+  
+  try{
+    const data=req.body;
+    const userID=req.user._id;
+    console.log("data in controller is:",data);
 
+    const result=await addHotel(data,userID);
+    console.log("result is controller is:",result);
+    res.status(200).json({
+      message:"Hotel created successfully",
+      data:result
+    })
+  }
+  catch(error){
+    res.status(500).json({
+      success:false,
+      error:error.message
+    })
+  }
+
+}
 

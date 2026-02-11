@@ -1,8 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import Hotel from '../models/hotel.model.js'
-
+import Hotel from "../models/hotel.model.js"
 
 export const fetchHotels=async()=>{
     
@@ -41,6 +40,22 @@ export const fetchHotel=async(data)=>{
     return{
         hotel
     }
-
-
 }
+
+export const addHotel=async(data,userID)=>{
+    console.log(":welcome to sevrice for addhotel")
+    
+    console.log("id is ins service",userID)
+    console.log("this is addhotel servcie hotelId is",data);
+
+    const newHotel=await Hotel.create({
+        ...data,
+        createdBy:userID
+       
+    })
+    console.log("this si hotel return from service:",Hotel);
+
+    return newHotel;
+       
+}
+
