@@ -1,4 +1,5 @@
-import { fetchHotels,searchForHotel,fetchHotel,addHotel} from "../services/hotel.service.js"
+import hotelModel from "../models/hotel.model.js";
+import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel} from "../services/hotel.service.js"
 
 export const getAllHotels = async (req, res) => {
 
@@ -49,6 +50,9 @@ export const getoneHotel=async (req,res)=>{
 export const createHotel=async(req,res)=>{
   
   try{
+    console.log("Request body is:",req.body);
+    console.log("request is",req)
+
     const data=req.body;
     const userID=req.user._id;
     console.log("data in controller is:",data);
@@ -66,6 +70,54 @@ export const createHotel=async(req,res)=>{
       error:error.message
     })
   }
-
 }
 
+
+
+// export const deleteHotel=async(req,res)=>{
+//   try{
+//     const id=req.params.id;
+//     const userId=req.user._id;
+//     const result=await delHotel(id,userId);
+//     console.log("result from controller of delete hotel",result);
+//     res.status(200).json({
+//       message:"Hotel deleted successfully"
+//       // data:
+//     })
+
+//   }
+//   catch(error){
+
+//   }
+// }
+
+
+export const updateHotelController=async(req,res)=>{
+  try{
+
+    const id=req.params.id;
+    const data=req.body;
+    const userID=req.user._id;
+
+    console.log("id in cotnrolller is:",id)
+    console.log("data is controller is:",data);
+    console.log("userId",userID);
+
+
+
+    const result=await modifyHotel(id,data,userID);
+
+    console.log(":updated reuslt:",result);
+    res.status(200).json({
+      success: true,
+      message: "Hotel updated successfully!",
+      data: result
+    });
+
+  }catch(error){
+     res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+}

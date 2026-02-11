@@ -58,4 +58,43 @@ export const addHotel=async(data,userID)=>{
     return newHotel;
        
 }
+// export const delHotel=async(id,userID)=>{
+    
+//     const hotel=await Hotel.findById(id);
+//     if(!hotel){
+//         throw new Error ({message:"hotel not found"});
 
+//     }
+//     const deleted=await Hotel.deleteOne(id);
+//     return {
+//         deleted
+//     }
+// }
+
+
+export const modifyHotel=async(id,data,userId)=>{
+
+    console.log("ID of hotel is ",id);
+
+    const existingHotel = await Hotel.findById(id);
+    if (!existingHotel) {
+        throw new Error("Hotel not found");
+    }
+    console.log("existing htoel detials is:",existingHotel);
+    console.log("existing hotel created  by is",existingHotel.createdBy.id)
+    if (existingHotel.createdBy.toString() !== userId.toString()) {
+        throw new Error("You are not authorized to update this hotel");
+    }
+    
+
+    const updated=await Hotel.findByIdAndUpdate(
+        
+        id,
+        data,
+        {
+            new:true
+        }
+
+    );
+    return updated;
+}
