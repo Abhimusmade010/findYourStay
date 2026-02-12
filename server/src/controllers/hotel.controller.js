@@ -1,5 +1,5 @@
 import hotelModel from "../models/hotel.model.js";
-import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel} from "../services/hotel.service.js"
+import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel,adminHotels} from "../services/hotel.service.js"
 
 export const getAllHotels = async (req, res) => {
 
@@ -72,8 +72,6 @@ export const createHotel=async(req,res)=>{
   }
 }
 
-
-
 // export const deleteHotel=async(req,res)=>{
 //   try{
 //     const id=req.params.id;
@@ -91,7 +89,6 @@ export const createHotel=async(req,res)=>{
 //   }
 // }
 
-
 export const updateHotelController=async(req,res)=>{
   try{
 
@@ -102,8 +99,6 @@ export const updateHotelController=async(req,res)=>{
     console.log("id in cotnrolller is:",id)
     console.log("data is controller is:",data);
     console.log("userId",userID);
-
-
 
     const result=await modifyHotel(id,data,userID);
 
@@ -116,6 +111,26 @@ export const updateHotelController=async(req,res)=>{
 
   }catch(error){
      res.status(400).json({
+      success: false,
+      message: error.message
+    });
+  }
+}
+
+export const getMyHotels=async(req,res)=>{
+  try{
+    const userId=req.user._id;
+    console.log("USer id from getmyHotels controller",userId);
+
+    const result =await adminHotels(userId);
+    console.log("Result after service is:",result);
+    res.status(200).json({
+      success:true,
+      message:"Hotel fetched for admin",
+      data:result
+    })
+  }catch(error){
+    res.status(400).json({
       success: false,
       message: error.message
     });

@@ -98,3 +98,15 @@ export const modifyHotel=async(id,data,userId)=>{
     );
     return updated;
 }
+
+export const adminHotels = async (userId) => {
+  console.log("User id got in adminHotels service:", userId);
+
+  if (!userId) {
+    throw new Error("User ID is required");
+  }
+
+  const result = await Hotel.find({ createdBy: userId }).populate("createdBy", "name email role");      // optional
+
+  return result;
+};
