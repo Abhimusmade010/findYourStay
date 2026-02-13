@@ -124,11 +124,13 @@ export const getMyHotels=async(req,res)=>{
 
     const result =await adminHotels(userId);
     console.log("Result after service is:",result);
+    
     res.status(200).json({
       success:true,
       message:"Hotel fetched for admin",
-      data:result
+      result
     })
+    // console.log("Response is:", );
   }catch(error){
     res.status(400).json({
       success: false,

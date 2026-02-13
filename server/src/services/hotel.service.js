@@ -58,6 +58,8 @@ export const addHotel=async(data,userID)=>{
     return newHotel;
        
 }
+
+
 // export const delHotel=async(id,userID)=>{
     
 //     const hotel=await Hotel.findById(id);
@@ -88,13 +90,11 @@ export const modifyHotel=async(id,data,userId)=>{
     
 
     const updated=await Hotel.findByIdAndUpdate(
-        
         id,
         data,
         {
             new:true
         }
-
     );
     return updated;
 }
@@ -107,6 +107,7 @@ export const adminHotels = async (userId) => {
   }
 
   const result = await Hotel.find({ createdBy: userId }).populate("createdBy", "name email role");      // optional
-
   return result;
 };
+
+
