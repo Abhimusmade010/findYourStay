@@ -21,6 +21,7 @@ export default function HotelsPage() {
       return res.data.result.hotels
     }
   }) 
+  
   console.log("Query fuction",hotels)
   //till here from backend hotels are fetched and from her onwards filter is applied on fetch data
 

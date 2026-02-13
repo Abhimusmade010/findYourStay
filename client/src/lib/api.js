@@ -48,6 +48,7 @@ export const hotelsAPI = {
   getAll: () => api.get('/hotels'),
   getById: (id) => api.get(`/hotels/${id}`),
   search: (searchParams) => api.post('/hotels/search',searchParams),
+  
   create: (data) => api.post('/hotels', data),
   update: (id, data) => api.put(`/hotels/${id}`, data),
   getMine: () => api.get('/hotels/mine/list'),

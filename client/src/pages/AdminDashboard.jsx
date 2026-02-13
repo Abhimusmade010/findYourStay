@@ -10,11 +10,14 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/Card";
+import { data } from "react-router";
+
 
 export default function AdminDashboard() {
+ console.log("inside the admin dashboard")
   const qc = useQueryClient();
   const { error: showError } = useToast();
-  const [form, setForm] = useState({
+  const initialFormState={
     name: "",
     description: "",
     pricePerNight: "",
@@ -24,13 +27,23 @@ export default function AdminDashboard() {
     address: "",
     amenities: [""],
     images: "",
-  });
+  }
+  const [form, setForm] = useState(initialFormState);
 
   const { data: hotels = [] } = useQuery({
-    queryKey: ["hotels"],
-    queryFn: async () => (await hotelsAPI.getMine()).data,
+    queryKey: ['hotels'],
+    queryFn: async () => {
+      const res=await hotelsAPI.getMine()
+      console.log("inside query fucntion",res);
+      return res.data.result
+    },
     throwOnError: true,
+    // (await hotelsAPI.getMine()).data,
+    
   });
+
+  console.log("hotels data is:",hotels);
+  console.log("data is ",data);
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -50,17 +63,24 @@ export default function AdminDashboard() {
           .map((u) => u.trim())
           .filter(Boolean),
       };
-      return (await hotelsAPI.create(payload)).data;
+
+      return await hotelsAPI.create(payload); // 🔥 YOU FORGOT THIS
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["hotels"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["hotels"] }); // also fix this
+      setForm(initialFormState);
+    },
     onError: (e) =>
-      showError(e?.response?.data?.message || "Failed to create hotel"),
+      showError(e?.response?.data?.message || "Failed to create hotel")
   });
+
+
 
   const onChange = (e) =>
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   const addAmenity = () =>
     setForm((prev) => ({ ...prev, amenities: [...prev.amenities, ""] }));
+
   const onAmenityChange = (index, value) =>
     setForm((prev) => ({
       ...prev,
@@ -195,3 +215,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
