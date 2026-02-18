@@ -1,21 +1,43 @@
 import hotelModel from "../models/hotel.model.js";
 import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel,adminHotels} from "../services/hotel.service.js"
+import { redisClient } from "../config/redis.js";
+
 
 export const getAllHotels = async (req, res) => {
 
   try {
-    // const data = req.body;
-    const result = await fetchHotels();
+    const cacheKey="all_hotels";
+    const getCacheData=await redisClient.get(cacheKey);
+    if(getCacheData){
+      console.log("Data from the redis fetched")
+      return res.status(200).json({
+        message: "Hotels fetched (from cache)",
+        result: JSON.parse(getcachedData)
+      })
+    }
+    await redisClient.del("all_hotels");
+    //if not in redis ftecht from  mongoDB and store in redis for further fetching
+    const result=await fetchHotels();
+    await redisClient.set(cacheKey,JSON.stringify(result),{
+      EX:60
+
+    }) 
+    console.log("Data strored in cache(redis)");
+
     console.log("inside getall hotels",result);
     res.status(200).json({                 //200 because for succes not 201 becuase nothing is creating 
       message: "Hotels fetched",
       result
     });
+
+
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 
 };
+
+
 
 export const searchHotel=async(req,res)=>{
 
