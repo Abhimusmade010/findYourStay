@@ -60,6 +60,7 @@ export default function BookingPage() {
       navigate('/profile')
     }
   })
+  
 
   useEffect(() => {
     function onDocClick(e) {
@@ -171,7 +172,7 @@ export default function BookingPage() {
             {isPending ? 'Booking...' : 'Confirm Booking'}
           
           </Button>
-          
+
         </CardContent>
       </Card>
     </div>

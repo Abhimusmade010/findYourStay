@@ -113,7 +113,7 @@ const Navigation = () => {
                     if (user?.role === 'Admin') navigate('/admin')
                   }}
                 >
-                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                  <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
                     {user?.name?.charAt(0) || 'U'}
                   </div>
                   <span className="text-sm font-medium">{user?.name}</span>

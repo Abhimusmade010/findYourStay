@@ -10,7 +10,14 @@ export default function WishlistPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['wishlist'],
     queryFn: async () => (await wishlistAPI.get()).data
+    // queryFn:async()=>{
+    //   const result=await wishlistAPI.get();
+    //   console.log("data in wishlist is:",result);
+    //   return result
+    // }
+
   })
+  console.log("wishlist data is ",data)
   const hotels = data?.wishlist || []
 
   const handleRemove = async (hotelId) => {

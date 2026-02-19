@@ -134,7 +134,7 @@ export default function HotelDetailsPage() {
               variant="outline"
               onClick={async () => {
                 try {
-                  await wishlistAPI.add(hotel._id)
+                  await wishlistAPI.add(hotel.hotel._id)
                   success('Hotel added to wishlist')
                 } catch (e) {
                   error(e?.response?.data?.message || 'Failed to add to wishlist')
