@@ -57,10 +57,16 @@ export const searchHotel=async(req,res)=>{
 export const getoneHotel=async (req,res)=>{
   try{
     const data=req.params.id;
-    const result=await fetchHotel(data);
+    console.log("in getoneHotel",data);
+
+    const hotel=await fetchHotel(data);
+
+    console.log("Hiotels details is",hotel);
+
+
     res.status(200).json({
       message:"Hotels",
-      result
+      hotel
     })
   }catch(error){
     res.status(400).json({

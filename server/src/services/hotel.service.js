@@ -31,18 +31,22 @@ export const searchForHotel=async(data)=>{
 }
 
 export const fetchHotel=async(data)=>{
-    const hotelId=data;
+    
 
-    const hotel=await Hotel.findById(hotelId);
+    const hotel=await Hotel.findById(data);
+    
+    console.log("Hotel from getoneHotel is",hotel);
+
     if(!hotel){
         throw new Error({message:"No Hotel Found"})
     }
     return{
-        hotel
+        hotel   
     }
 }
 
 export const addHotel=async(data,userID)=>{
+
     console.log(":welcome to sevrice for addhotel")
     
     console.log("id is ins service",userID)
