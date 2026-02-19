@@ -3,7 +3,7 @@ import authRoutes from './auth.routes.js'
 import bookingRoutes from './booking.routes.js'
 import hotelRoutes from './hotel.routes.js'
 // import reviewRoutes from './review.routes.js'
-// import wishlistRoutes from './wishlist.routes'
+import wishlistRoutes from './wishlist.routes.js'
 
 const router=express.Router();
 
@@ -15,6 +15,7 @@ router.use("/hotels", hotelRoutes);
 
 router.use("/bookings",bookingRoutes);
 // app.use("/api/reviews",reviewRoutes);
-// app.use("/api",wishlistRoutes);
+
+router.use("/",wishlistRoutes);
 
 export default router

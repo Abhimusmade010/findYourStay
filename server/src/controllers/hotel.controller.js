@@ -1,4 +1,4 @@
-import hotelModel from "../models/hotel.model.js";
+// import hotelModel from "../models/hotel.model.js";
 import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel,adminHotels} from "../services/hotel.service.js"
 import { redisClient } from "../config/redis.js";
 
