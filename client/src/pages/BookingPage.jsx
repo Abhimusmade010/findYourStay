@@ -18,8 +18,16 @@ export default function BookingPage() {
 
   const { data: hotel } = useQuery({
     queryKey: ['hotel', id],
-    queryFn: async () => (await hotelsAPI.getById(id)).data
+    // queryFn: async () => (await hotelsAPI.getById(id)).data
+    queryFn:async()=>{
+          const result=await hotelsAPI.getById(id);
+          console.log("result in get hotel details is ",result);
+          console.log("detials is ",result.data.hotel);
+          return result.data.hotel;
+      }
   })
+  console.log("aoutside booking page",hotel.hotel.description)
+
 
   const isOverlap = useMemo(() => {
     if (!hotel || !Array.isArray(hotel.bookedDates)) return () => false
@@ -40,6 +48,7 @@ export default function BookingPage() {
       return false
     }
   }, [hotel])
+
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: async () => {
@@ -63,12 +72,16 @@ export default function BookingPage() {
   }, [])
 
   return (
+
     <div className="max-w-xl mx-auto px-6 py-10">
       <Card>
         <CardHeader>
-          <CardTitle>Book {hotel?.name || 'Hotel'}</CardTitle>
+          <CardTitle>Book {hotel.hotel?.name || 'Hotel'}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+
+
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
             <div className="relative">
               <label className="block text-sm mb-1">Check-in</label>
@@ -80,11 +93,13 @@ export default function BookingPage() {
             </div>
 
             {pickerOpen && (
+
               <div ref={popRef} className="absolute z-50 top-full mt-2 left-0 sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-[360px] rounded-xl border border-border/50 bg-background/95 backdrop-blur p-3 shadow-xl">
                 <BookingMonth
                   monthDate={currentMonth}
                   setMonthDate={setCurrentMonth}
                   bookedDates={hotel?.bookedDates || []}
+                  
                   onSelect={(d) => {
                     const y = d.getFullYear()
                     const m = String(d.getMonth() + 1).padStart(2, '0')
@@ -122,24 +137,31 @@ export default function BookingPage() {
                     }
                     setPickerOpen(null)
                   }}
+
                 />
                 <div className="mt-2 text-xs text-muted-foreground flex items-center gap-3">
                   <span className="inline-block w-3 h-3 rounded-sm bg-red-600" /> Booked
                   <span className="inline-block w-3 h-3 rounded-sm bg-primary" /> Selected
                 </div>
               </div>
+
             )}
           </div>
+
+
           {error ? <p className="text-sm text-destructive">{error.response?.data?.message || 'Booking failed'}</p> : null}
           {!checkIn || !checkOut ? (
             <p className="text-sm text-muted-foreground">Select both check-in and check-out dates.</p>
           ) : null}
+
           {checkIn && checkOut && new Date(`${checkOut}T00:00:00`) <= new Date(`${checkIn}T00:00:00`) ? (
             <p className="text-sm text-destructive">Check-out must be after check-in.</p>
           ) : null}
+
           {isOverlap(checkIn, checkOut) ? (
             <p className="text-sm text-destructive">Selected dates overlap existing bookings. Please choose different dates.</p>
           ) : null}
+
           <Button className="w-full" variant="gradient" disabled={
             isPending ||
             !checkIn || !checkOut ||
@@ -147,12 +169,19 @@ export default function BookingPage() {
             isOverlap(checkIn, checkOut)
           } onClick={() => mutate()}>
             {isPending ? 'Booking...' : 'Confirm Booking'}
+          
           </Button>
+          
         </CardContent>
       </Card>
     </div>
+
   )
 }
+
+
+
+
 
 function BookingMonth({ monthDate, setMonthDate, bookedDates, onSelect }) {
   const start = useMemo(() => new Date(monthDate.getFullYear(), monthDate.getMonth(), 1), [monthDate])

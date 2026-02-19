@@ -23,11 +23,8 @@ export default function HotelDetailsPage() {
       console.log("detials is ",result.data.hotel);
       return result.data.hotel;
     }
-    
   })
-  
-
-
+ 
   const { data: reviews = [] } = useQuery({
     queryKey: ['hotel-reviews', id],
     queryFn: async () => (await reviewsAPI.getByHotel(id)).data
@@ -35,7 +32,6 @@ export default function HotelDetailsPage() {
     
   })
   
-
   const { data: past = [] } = useQuery({
     queryKey: ['bookings', 'history'],
     queryFn: async () => (await (await import('../lib/api')).bookingsAPI.getHistory()).data
@@ -113,7 +109,7 @@ export default function HotelDetailsPage() {
               {(() => {
                 const today = new Date()
                 today.setHours(0,0,0,0)
-                const isTodayBooked = Array.isArray(hotel.bookedDates) && hotel.bookedDates.some(range => {
+                const isTodayBooked = Array.isArray(hotel.hotel.bookedDates) && hotel.hotel.bookedDates.some(range => {
                   if (!Array.isArray(range) || range.length === 0) return false
                   const start = new Date(range[0])
                   start.setHours(0,0,0,0)
@@ -131,8 +127,8 @@ export default function HotelDetailsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-semibold">${hotel.pricePerNight}<span className="text-sm text-muted-foreground"> / night</span></div>
-            <Button className="w-full mt-4" variant="gradient" onClick={() => navigate(`/booking/${hotel._id}`)}>Book Now</Button>
+            <div className="text-2xl font-semibold">${hotel.hotel.pricePerNight}<span className="text-sm text-muted-foreground"> / night</span></div>
+            <Button className="w-full mt-4" variant="gradient" onClick={() => navigate(`/booking/${hotel.hotel._id}`)}>Book Now</Button>
             <Button
               className="w-full mt-2"
               variant="outline"
