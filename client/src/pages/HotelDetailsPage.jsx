@@ -16,12 +16,23 @@ export default function HotelDetailsPage() {
 
   const { data: hotel, isLoading } = useQuery({
     queryKey: ['hotel', id],
-    queryFn: async () => (await hotelsAPI.getById(id)).data
+      // queryFn: async () => (await hotelsAPI.getById(id)).data.hotel
+    queryFn:async()=>{
+      const result=await hotelsAPI.getById(id);
+      console.log("result in get hotel details is ",result);
+      console.log("detials is ",result.data.hotel);
+      return result.data.hotel;
+    }
+    
   })
+  
+
 
   const { data: reviews = [] } = useQuery({
     queryKey: ['hotel-reviews', id],
     queryFn: async () => (await reviewsAPI.getByHotel(id)).data
+
+    
   })
   
 
@@ -49,14 +60,17 @@ export default function HotelDetailsPage() {
   if (isLoading) return <div className="max-w-5xl mx-auto px-6 py-10">Loading...</div>
 
   const images = hotel?.images?.length ? hotel.images : undefined
+  console.log("hotel data is ",hotel)
+  console.log("hotel description is ",hotel.hotel.description)
+  console.log("hotel description is ",hotel.hotel.location.state);
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10 space-y-8">
       {/* Header */}
       <div className="space-y-4">
-        <h1 className="text-3xl font-bold">{hotel.name}</h1>
-        <p className="text-muted-foreground">{hotel.location?.city}, {hotel.location?.state}, {hotel.location?.country}</p>
-        <Carousel images={images} />
+        <h1 className="text-3xl font-bold">{hotel.hotel.name}</h1>
+        <p className="text-muted-foreground">{hotel.hotel.location?.city}, {hotel.hotel.location?.state}, {hotel.hotel.location?.country}</p>
+        <Carousel images={images}/>
       </div>
 
       {/* Content */}
@@ -66,12 +80,13 @@ export default function HotelDetailsPage() {
             <CardTitle>About</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground leading-relaxed">{hotel.description}</p>
-            {hotel.amenities?.length ? (
+            <p className="text-muted-foreground leading-relaxed">{hotel.hotel.description}</p>
+            
+            {hotel.hotel.amenities?.length ? (
               <div className="mt-6">
                 <h3 className="font-medium mb-2">Amenities</h3>
                 <div className="flex flex-wrap gap-2">
-                  {hotel.amenities.map((a, idx) => (
+                  {hotel.hotel.amenities.map((a, idx) => (
                     <span key={idx} className="px-3 py-1 rounded-full text-sm bg-secondary/60">{a}</span>
                   ))}
                 </div>
@@ -81,11 +96,11 @@ export default function HotelDetailsPage() {
             <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-medium mb-2">Availability</h3>
-                <Calendar bookedDates={hotel.bookedDates || []} />
+                <Calendar bookedDates={hotel.hotel.bookedDates || []} />
               </div>
               <div>
                 <h3 className="font-medium mb-2">Location</h3>
-                <Map query={`${hotel.name} ${hotel.location?.city || ''}`} />
+                <Map query={`${hotel.hotel.name} ${hotel.hotel.location?.city || ''}`} />
               </div>
             </div>
           </CardContent>
