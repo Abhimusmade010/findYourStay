@@ -21,6 +21,8 @@ app.use(cors({
 
 app.use(express.urlencoded({ extended: true }));
 console.log("inside the app,js")
+
+
 app.use("/api", routes);
 
 app.get("/", (req, res) => {
