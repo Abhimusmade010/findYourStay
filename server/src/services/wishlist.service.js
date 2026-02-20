@@ -1,6 +1,6 @@
 
 import User from "../models/user.model.js"
-
+import Hotel from "../models/hotel.model.js"
 //store wishlist data in wishlist array of the user model
 
 export const addwishlistService=async(userId,hotelId)=>{
@@ -51,12 +51,37 @@ export const getwishlistservice=async(userId)=>{
     // const wishlistArray = user.wishlist;
     const wishlistArray=await User.findById(userId).populate("wishlist")
 
-    
-
-
     console.log("wishlist is ",wishlistArray.wishlist);
     console.log("user.wishlist is",user.wishlist);
     return wishlistArray.wishlist;
+
+
+}
+
+export const deletewishlistservice=async(userId,hotelId)=>{
+
+    console.log("Abhi entered in the deletewishlistservice")
+    const hotelexists=await Hotel.findById(hotelId);
+
+
+    if(!hotelexists){
+        throw new Error("Hotel not Found");
+    }
+    const user=await User.findById(userId);
+
+
+    if(!user){
+        throw new Error("User not Found");
+    }
+
+    console.log("wishlist befroe abhi delete is",user.wishlist);
+    user.wishlist = user.wishlist.filter(id => id.toString() !== hotelId);
+
+    console.log("wishlist after abhi deleted it",user.wishlist);
+
+    await user.save();
+    
+    return user.wishlist;
 
 
 }
