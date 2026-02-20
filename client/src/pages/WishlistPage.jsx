@@ -7,18 +7,23 @@ import { useToast } from '../components/ui/Toast'
 export default function WishlistPage() {
   const queryClient = useQueryClient()
   const { success, error } = useToast()
+
   const { data, isLoading } = useQuery({
     queryKey: ['wishlist'],
-    queryFn: async () => (await wishlistAPI.get()).data
-    // queryFn:async()=>{
-    //   const result=await wishlistAPI.get();
-    //   console.log("data in wishlist is:",result);
-    //   return result
-    // }
+    // queryFn: async () => (await wishlistAPI.get()).data
+    queryFn:async()=>{
+      const response=await wishlistAPI.get();
+      console.log("data in wishlist is:",response.data);
+      return response.data
+    }
 
   })
-  console.log("wishlist data is ",data)
-  const hotels = data?.wishlist || []
+  
+  // console.log("wishlist data is ",data.result)
+
+  const hotels = data?.result || []
+
+  console.log("hotels is",hotels)
 
   const handleRemove = async (hotelId) => {
     try {
