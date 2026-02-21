@@ -24,8 +24,8 @@ export const addToWishlistcontroller=async(req,res)=>{
             error:error.message
         })
     }
-
 }
+
 export const getwishlistcontroller=async(req,res)=>{
 
     try{
@@ -50,10 +50,9 @@ export const getwishlistcontroller=async(req,res)=>{
 
     }
 }
+
 export const deletewishlistcontroller=async(req,res)=>{
     try{
-
-
         const {hotelId}=req.body;
         const userId=req.user._id;
         console.log("hotel id is",hotelId)
@@ -65,12 +64,12 @@ export const deletewishlistcontroller=async(req,res)=>{
             result,
             message:"successfully remooved from wishlist"
         })
-
     }catch(error){
         res.status(400).json({
+            
             success:false,
             error:error.message
+
         })
     }
-
 }

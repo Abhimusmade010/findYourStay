@@ -6,16 +6,19 @@ import { redisClient } from "../config/redis.js";
 export const getAllHotels = async (req, res) => {
 
   try {
+
     const cacheKey="all_hotels";
     const getCacheData=await redisClient.get(cacheKey);
+
     if(getCacheData){
       console.log("Data from the redis fetched")
       return res.status(200).json({
         message: "Hotels fetched (from cache)",
-        result: JSON.parse(getcachedData)
+        result: JSON.parse(getCachedData)
       })
     }
-    await redisClient.del("all_hotels");
+    
+    // await redisClient.del("all_hotels");
     //if not in redis ftecht from  mongoDB and store in redis for further fetching
     const result=await fetchHotels();
     await redisClient.set(cacheKey,JSON.stringify(result),{

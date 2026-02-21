@@ -9,13 +9,13 @@ export const addwishlistService=async(userId,hotelId)=>{
     console.log("recieved data in wishlisr servixe is fofr hotelId",hotelId);
     
     if(!hotelId){
-        throw  new Error({message:"Hotel not found"});
+        throw  new Error("Hotel not found");
     }
     const user=await User.findById(userId);
     console.log("user  data is ",user);
 
     if(!user){
-        throw  new Error({message:"User not found"});
+        throw  new Error("User not found");
     }
     //check if hotel already presne tin the wishlist 
     
@@ -28,7 +28,7 @@ export const addwishlistService=async(userId,hotelId)=>{
     //if present in the wishlist throw the error
 
     if (userAlreadyHasHotel){
-      throw  new Error( {message: "Hotel already in wishlist" });
+        throw new Error("Hotel already in wishlist");
     }
 
     //push hotel in wishlist aarray for user 
@@ -38,6 +38,7 @@ export const addwishlistService=async(userId,hotelId)=>{
     await user.save();
 
     return {
+        
         wishlist:user.wishlist
     }
 }
