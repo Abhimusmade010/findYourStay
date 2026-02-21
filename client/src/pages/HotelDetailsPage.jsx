@@ -24,6 +24,7 @@ export default function HotelDetailsPage() {
       return result.data.hotel;
     }
   })
+
  
   const { data: reviews = [] } = useQuery({
     queryKey: ['hotel-reviews', id],
@@ -137,7 +138,8 @@ export default function HotelDetailsPage() {
                   await wishlistAPI.add(hotel.hotel._id)
                   success('Hotel added to wishlist')
                 } catch (e) {
-                  error(e?.response?.data?.message || 'Failed to add to wishlist')
+                  // console.log("error message is ",e.data.message)
+                  error(e?.response?.data?.error || 'Failed to add to wishlist')
                 }
               }}
             >

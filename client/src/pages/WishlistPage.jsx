@@ -19,7 +19,7 @@ export default function WishlistPage() {
 
   })
   
-  // console.log("wishlist data is ",data.result)
+  console.log("wishlist data is ",data.message)
 
   const hotels = data?.result || []
 

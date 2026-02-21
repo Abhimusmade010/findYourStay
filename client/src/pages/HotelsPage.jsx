@@ -20,6 +20,8 @@ export default function HotelsPage() {
       console.log("inside query fucntion",res);
       return res.data.result.hotels
     }
+    // staleTime: 1000 * 60 * 5,   // ✅ 5 minutes
+    // refetchOnWindowFocus: false // optional
   }) 
   
   console.log("Query fuction",hotels)
