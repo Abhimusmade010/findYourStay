@@ -7,6 +7,7 @@ import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date
 export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}) => {
 
   // 1️⃣ Find hotel
+  console.log("customer id is ",customerId)
   const hotel = await Hotel.findById(hotelId);
   if (!hotel) {
     throw new Error("Hotel not found");
@@ -28,6 +29,11 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   }
 
   // 3️⃣ Check overlapping CONFIRMED bookings
+
+
+  //if not confirmed by the admin the same hotel same dates will be booked by many users until is fixed by the admin i.e 
+  // hotel admin need to approve to one of the customer and others will get notified that booking is not avaialable
+
   const conflict = await Booking.findOne({
     hotel: hotelId,
     status: "Confirmed",
@@ -59,3 +65,4 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   
   return booking;
 };
+
