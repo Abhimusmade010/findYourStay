@@ -26,10 +26,17 @@ export default function BookingsPage() {
   // NOTE: enabled is passed as an option to useQuery (not destructured)
   const { data: pending = [] } = useQuery({
     queryKey: ['bookings', 'pending'],
-    queryFn: async () => (await bookingsAPI.getPending()).data,
-    enabled: isAdmin
-  })
+    // queryFn: async () => (await bookingsAPI.getPending()).data,
+    queryFn:async()=>{
+      const result=await bookingsAPI.getPending();
+      console.log("In pending of frontend result of getPOending axios api is",result.data.result)
+      return result.data.result
+    },
 
+    enabled: isAdmin
+
+  })
+  // console.log("response after get pending",response.result)
   const { data: owned = [] } = useQuery({
     queryKey: ['bookings', 'owned'],
     queryFn: async () => (await bookingsAPI.getOwned()).data,
