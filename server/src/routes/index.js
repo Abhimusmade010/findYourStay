@@ -15,9 +15,10 @@ router.use("/hotels", hotelRoutes);
 
 router.use("/bookings",bookingRoutes);
 
-// app.use("/api/reviews",reviewRoutes);
+
 
 router.use("/",wishlistRoutes);
 
+// app.use("/api/reviews",reviewRoutes);
 
 export default router

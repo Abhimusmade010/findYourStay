@@ -1,6 +1,7 @@
 import Booking from "../models/booking.model.js";
 import Hotel from "../models/hotel.model.js";
 // import User from "../models/user.model"
+// import Booking from "../models/booking.model.js"
 
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
 
@@ -66,3 +67,42 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   return booking;
 };
 
+// export const approveBookingService=async(data)=>{
+
+//   //bookings of sai samadhan hotel will go the admin who created sai samadhan hotel
+
+//   //logic to handle the approve booking from hotel admin to the customer
+
+
+// }
+
+export const getmyHotelsPendingBookingService=async(userId)=>{
+
+  //get all bookings for the hotel 
+
+  const hotel=await Hotel.find({createdBy:userId});
+  console.log("hotel crteated by admin is ",hotel);
+  
+  if (!hotel.length) {
+    return [];
+  }
+  //hotel id extracted
+
+  const hotelIds = hotel.map(hotel => hotel._id);
+
+  // const hotelId=hotel._id;
+  console.log("hotel id is",hotelIds);
+  
+
+  const bookings = await Booking.find({
+    hotel: { $in: hotelIds },
+    status: "Pending"
+  }).populate("customer hotel");
+
+  
+  console.log("Bookings data is ",bookings);
+
+  return bookings;
+
+
+}

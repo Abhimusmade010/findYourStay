@@ -30,6 +30,7 @@ export const authMiddleware = async (req, res, next) => {
     if (!user) return res.status(401).json({ message: "Unauthorized from user" });
 
     req.user = user;
+    console.log("role in the auth middleware is ",req.user.role)
     console.log("req user is",req.user._id)
     next();
   }
