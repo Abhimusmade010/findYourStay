@@ -7,7 +7,7 @@ import routes from './src/routes/index.js'
 
 
 const app = express();
-console.log("abhishek")
+
 app.use(express.json());
 
 
@@ -20,8 +20,8 @@ app.use(cors({
 }));
 
 app.use(express.urlencoded({ extended: true }));
-console.log("inside the app,js")
-
+console.log("!!!!!!!!!!!! Welcome Developer to the APP !!!!!!!!!!!!!!!!!!!!!!!")
+ 
 
 app.use("/api", routes);
 

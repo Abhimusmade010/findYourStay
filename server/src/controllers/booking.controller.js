@@ -1,7 +1,9 @@
 
-// import { approveBookingService } from "../services/booking.service.js"
+import { approveBookingService } from "../services/booking.service.js"
 import { createBookingService } from "../services/booking.service.js";
 import { getmyHotelsPendingBookingService } from "../services/booking.service.js";
+
+
 
 export const createBookingcontroller=async (req,res)=>{
     try{
@@ -31,23 +33,28 @@ export const createBookingcontroller=async (req,res)=>{
 
 }
 
-// export const approveBookingController=async(req,res)=>{
-//     try{
-//         const data=req.body;
-//         // controller for the approve booking by the admin for the customer 
-//         const result =await approveBookingService(data);
+
+export const approveBookingController=async(req,res)=>{
+
+    try{
+        const {bookingId}=req.body;
+        const userId=req.user._id;
+        // controller for the approve booking by the admin for the customer 
+        console.log("data from the req.,body is ",bookingId);
+        const result =await approveBookingService(userId,bookingId);
         
-//         res.status(200).json({
-//             result,
-//             message:"successfully confirmed booking by the admin for you!!"
-//         })
-//     }catch(error){
-//         res.status(400).json({
-//             success:false,
-//             error:error.message
-//         })
-//     }
-// }
+        res.status(200).json({
+            result,
+            message:"successfully confirmed booking by the admin for you!!"
+        })
+    }catch(error){
+        res.status(400).json({
+            success:false,
+            error:error.message
+        })
+    }
+}
+
 
 export const getmyHotelsPendingBookingController=async(req,res)=>{
     try{

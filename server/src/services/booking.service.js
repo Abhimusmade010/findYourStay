@@ -67,14 +67,56 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   return booking;
 };
 
-// export const approveBookingService=async(data)=>{
+export const approveBookingService=async(userId,bookingId)=>{
 
-//   //bookings of sai samadhan hotel will go the admin who created sai samadhan hotel
+  console.log("booking Id is ",bookingId);
+  const booking = await Booking.findById(bookingId).populate("hotel");
+  if(!booking){
+    throw new Error("Booking not found")
+  }
+  if(booking.status!="Pending"){
+    throw new Error("Only pending bookings can be approved")
+  }
+  if (String(booking.hotel.createdBy) !== String(userId)){
+    throw new Error("Not authorized to approve this booking")
+  }
 
-//   //logic to handle the approve booking from hotel admin to the customer
+  
+  console.log("hotel id in booking is",booking.hotel._id)
+  const hotel = await Hotel.findById(booking.hotel._id);
+  const dateRange = buildDateRangeArray(booking.checkIn, booking.checkOut);
+
+  const overlaps = hotel.bookedDates.some(range => {
+      if (!Array.isArray(range) || range.length === 0) return false;
+      const existingStart = new Date(range[0]).setHours(0,0,0,0);
+      const existingEndExclusive = new Date(range[range.length - 1]);
+      existingEndExclusive.setHours(0,0,0,0);
+      existingEndExclusive.setDate(existingEndExclusive.getDate() + 1); // make it exclusive for comparison
+
+      const newStart = new Date(dateRange[0]).setHours(0,0,0,0);
+      const newEndExclusive = new Date(dateRange[dateRange.length - 1] || dateRange[0]);
+      newEndExclusive.setHours(0,0,0,0);
+      newEndExclusive.setDate(newEndExclusive.getDate() + 1);
+
+      // intervals [start, end) overlap if start < otherEnd && otherStart < end
+      return (newStart < existingEndExclusive) && (existingStart < newEndExclusive);
+  });
+  if(overlaps){
+    throw new Error("Selected dates overlap an existing booking")
+  }
+
+    hotel.bookedDates.push(dateRange);
+    hotel.availability = false;
+    await hotel.save();
+    booking.status = "Confirmed";
+    await booking.save();
+
+    return {booking,hotel}
 
 
-// }
+
+}
+
 
 export const getmyHotelsPendingBookingService=async(userId)=>{
 
