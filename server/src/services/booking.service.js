@@ -1,6 +1,6 @@
 import Booking from "../models/booking.model.js";
 import Hotel from "../models/hotel.model.js";
-// import User from "../models/user.model"
+import User from "../models/user.model.js"
 // import Booking from "../models/booking.model.js"
 
 
@@ -71,7 +71,15 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
 
   // check first if the hotel user is booking is present in the wishlist if present remove it 
   // const hotelWishListArray=User.wishlist
-  
+  await User.findByIdAndUpdate(
+    customerId,
+    {
+      $pull: { wishlist: hotelId }
+    },
+    { new: true }
+  );
+
+  // console.log("booking now with updated wishlist",user)
   
   return booking;
 };
