@@ -3,7 +3,9 @@ import Hotel from "../models/hotel.model.js";
 // import User from "../models/user.model"
 // import Booking from "../models/booking.model.js"
 
+
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
+
 
 export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}) => {
 
@@ -63,6 +65,13 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     status: "Pending",
   });
   console.log("final boking is ",booking);
+  //if bookking is done then remove this hotel from the wish list of the user 
+  // we have booklist array field in user schema 
+  
+
+  // check first if the hotel user is booking is present in the wishlist if present remove it 
+  // const hotelWishListArray=User.wishlist
+  
   
   return booking;
 };
@@ -111,9 +120,10 @@ export const approveBookingService=async(userId,bookingId)=>{
     booking.status = "Confirmed";
     await booking.save();
 
+    //now if user has added the hotel in wishlist first and booked and booking in approved then it should removed from the wishlist 
+
+
     return {booking,hotel}
-
-
 
 }
 
