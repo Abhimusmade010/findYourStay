@@ -43,8 +43,17 @@ export default function BookingsPage() {
     enabled: isAdmin
   })
 
+  console.log("before approveMutation")
+
+
   const approveMutation = useMutation({
-    mutationFn: async (id) => (await bookingsAPI.approve(id)).data,
+    // mutationFn: async (id) => (await bookingsAPI.approve(id)).data,
+    mutationFn:async(id)=>{
+      const result=await bookingsAPI.approve(id);
+      console.log("data is ",result)
+      return result.data;
+    },
+    // console.log("apprive mutation data is",)
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
       showSuccess('Booking approved')
@@ -52,6 +61,7 @@ export default function BookingsPage() {
     onError: (e) => showError(e?.response?.data?.message || 'Failed to approve')
   })
 
+  // console.log("result from mutation approve is",mutationFn)
   const denyMutation = useMutation({
     mutationFn: async (id) => (await bookingsAPI.deny(id)).data,
     onSuccess: () => {
@@ -60,6 +70,7 @@ export default function BookingsPage() {
     },
     onError: (e) => showError(e?.response?.data?.message || 'Failed to deny')
   })
+
 
   const TabButton = ({ id, label }) => (
     <Button variant={activeTab === id ? 'gradient' : 'outline'} size="sm" onClick={() => setActiveTab(id)}>
@@ -72,10 +83,12 @@ export default function BookingsPage() {
       <div className="flex items-center gap-2">
         <TabButton id="mine" label="My Bookings" />
         <TabButton id="history" label="History" />
+        
         {isAdmin ? <>
           <TabButton id="pending" label="Pending (Admin)" />
           <TabButton id="owned" label="Confirmed (Admin)" />
         </> : null}
+
       </div>
 
       {activeTab === 'mine' && (

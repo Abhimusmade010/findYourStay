@@ -58,7 +58,7 @@ export const bookingsAPI = {
   getHistory: () => api.get('/bookings/history'),
   getActive: () => api.get('/bookings/active'),
   getPending: () => api.get('/bookings/pending'),
-  approve: (id) => api.post(`/bookings/${id}/approve`),
+  approve: (id) => api.post(`/bookings/approve`),
   deny: (id) => api.post(`/bookings/${id}/deny`),
   getOwned: () => api.get('/bookings/owned/confirmed'),
 }
