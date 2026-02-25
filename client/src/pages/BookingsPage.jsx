@@ -40,6 +40,11 @@ export default function BookingsPage() {
   const { data: owned = [] } = useQuery({
     queryKey: ['bookings', 'owned'],
     queryFn: async () => (await bookingsAPI.getOwned()).data,
+    // queryFn:async()=>{
+    //   const result=await bookingsAPI.getOwned();
+    //   console.log("In pending of frontend result of getOwned axios api is",result.data.result)
+    //   return result.data.result
+    // },
     enabled: isAdmin
   })
 
@@ -47,13 +52,11 @@ export default function BookingsPage() {
 
 
   const approveMutation = useMutation({
-    // mutationFn: async (id) => (await bookingsAPI.approve(id)).data,
     mutationFn:async(id)=>{
       const result=await bookingsAPI.approve(id);
       console.log("data is ",result)
       return result.data;
     },
-    // console.log("apprive mutation data is",)
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
       showSuccess('Booking approved')
@@ -61,6 +64,8 @@ export default function BookingsPage() {
     onError: (e) => showError(e?.response?.data?.message || 'Failed to approve')
   })
 
+
+  console.log("below approve mutaton logxi in react file")
   // console.log("result from mutation approve is",mutationFn)
   const denyMutation = useMutation({
     mutationFn: async (id) => (await bookingsAPI.deny(id)).data,
