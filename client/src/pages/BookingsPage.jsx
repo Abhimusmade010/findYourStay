@@ -39,12 +39,12 @@ export default function BookingsPage() {
   // console.log("response after get pending",response.result)
   const { data: owned = [] } = useQuery({
     queryKey: ['bookings', 'owned'],
-    queryFn: async () => (await bookingsAPI.getOwned()).data,
-    // queryFn:async()=>{
-    //   const result=await bookingsAPI.getOwned();
-    //   console.log("In pending of frontend result of getOwned axios api is",result.data.result)
-    //   return result.data.result
-    // },
+    // queryFn: async () => (await bookingsAPI.getOwned()).data,
+    queryFn:async()=>{
+      const result=await bookingsAPI.getOwned();
+      console.log("In pending of frontend result of getOwned axios api is",result.data.result)
+      return result.data.result
+    },
     enabled: isAdmin
   })
 
