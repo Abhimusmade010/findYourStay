@@ -12,11 +12,7 @@ console.log("inside the index,js for routes!");
 
 router.use("/auth", authRoutes);
 router.use("/hotels", hotelRoutes);
-
 router.use("/bookings",bookingRoutes);
-
-
-
 router.use("/",wishlistRoutes);
 
 // app.use("/api/reviews",reviewRoutes);

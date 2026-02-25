@@ -5,24 +5,40 @@ import User from "../models/user.model.js"
 
 
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
+export const getConfirmedBookingService=async(req,res)=>{
+  // console.log("booking Id is ",bookingId);
+  const booking = await Booking.findById(bookingId).populate("hotel");
+  if(!booking){
+    throw new Error("Booking not found")
+  }
+  if(booking.status!="Pending"){
+    throw new Error("Only pending bookings can be approved")
+  }
+  if (String(booking.hotel.createdBy) !== String(userId)){
+    throw new Error("Not authorized to approve this booking")
+  }
+  const hotel = await Hotel.findById(booking.hotel._id,booking.status="Confirmed");
 
+  return {booking,hotel}
+
+}
 
 export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}) => {
 
   // 1️⃣ Find hotel
-  console.log("customer id is ",customerId)
+  // console.log("customer id is ",customerId)
   const hotel = await Hotel.findById(hotelId);
   if (!hotel) {
     throw new Error("Hotel not found");
   }
-  console.log("in booking service",hotel);
+  // console.log("in booking service",hotel);
 
   // 2️⃣ Normalize dates
   const checkInDate = normalizeDate(checkIn);
   const checkOutDate = normalizeDate(checkOut);
 
-  console.log("chechIn dates",checkInDate)
-  console.log("check out dates",checkOutDate)
+  // console.log("chechIn dates",checkInDate)
+  // console.log("check out dates",checkOutDate)
   if (!checkInDate || !checkOutDate) {
     throw new Error("Invalid dates");
   }
@@ -52,8 +68,8 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   // 4️⃣ Calculate total price
   const nights = buildDateRangeArray(checkInDate, checkOutDate).length;
   const totalPrice = nights * (hotel.pricePerNight || 0);
-  console.log("total nights",nights)
-  console.log("totalPrice",totalPrice);
+  // console.log("total nights",nights)
+  // console.log("totalPrice",totalPrice);
 
   // 5️⃣ Create booking (Pending)
   const booking = await Booking.create({
@@ -64,7 +80,7 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     totalPrice,
     status: "Pending",
   });
-  console.log("final boking is ",booking);
+  // console.log("final boking is ",booking);
   //if bookking is done then remove this hotel from the wish list of the user 
   // we have booklist array field in user schema 
   
@@ -84,9 +100,9 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   return booking;
 };
 
-export const approveBookingService=async(userId,bookingId)=>{
-
-  console.log("booking Id is ",bookingId);
+export const  approveBookingService=async(userId,bookingId)=>{
+   console.log("in approveBookingService")
+  // console.log("booking Id is ",bookingId);
   const booking = await Booking.findById(bookingId).populate("hotel");
   if(!booking){
     throw new Error("Booking not found")
@@ -97,10 +113,9 @@ export const approveBookingService=async(userId,bookingId)=>{
   if (String(booking.hotel.createdBy) !== String(userId)){
     throw new Error("Not authorized to approve this booking")
   }
-
   
-  console.log("hotel id in booking is",booking.hotel._id)
-  const hotel = await Hotel.findById(booking.hotel._id);
+  // console.log("hotel id in booking is",booking.hotel._id)
+  
   const dateRange = buildDateRangeArray(booking.checkIn, booking.checkOut);
 
   const overlaps = hotel.bookedDates.some(range => {
@@ -139,9 +154,10 @@ export const approveBookingService=async(userId,bookingId)=>{
 export const getmyHotelsPendingBookingService=async(userId)=>{
 
   //get all bookings for the hotel 
+  console.log("in the getmyHotels Pending BookingController")
 
   const hotel=await Hotel.find({createdBy:userId});
-  console.log("hotel crteated by admin is ",hotel);
+  // console.log("hotel crteated by admin is ",hotel);
   
   if (!hotel.length) {
     return [];
@@ -151,7 +167,7 @@ export const getmyHotelsPendingBookingService=async(userId)=>{
   const hotelIds = hotel.map(hotel => hotel._id);
 
   // const hotelId=hotel._id;
-  console.log("hotel id is",hotelIds);
+  // console.log("hotel id is",hotelIds);
   
 
   const bookings = await Booking.find({
@@ -160,9 +176,10 @@ export const getmyHotelsPendingBookingService=async(userId)=>{
   }).populate("customer hotel");
 
   
-  console.log("Bookings data is ",bookings);
+  // console.log("Bookings data is ",bookings);
 
   return bookings;
 
 
 }
+

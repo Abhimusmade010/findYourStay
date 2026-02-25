@@ -35,7 +35,7 @@ export const fetchHotel=async(data)=>{
 
     const hotel=await Hotel.findById(data);
     
-    console.log("Hotel from getoneHotel is",hotel);
+    // console.log("Hotel from getoneHotel is",hotel);
 
     if(!hotel){
         throw new Error({message:"No Hotel Found"})
@@ -47,17 +47,17 @@ export const fetchHotel=async(data)=>{
 
 export const addHotel=async(data,userID)=>{
 
-    console.log(":welcome to sevrice for addhotel")
+    // console.log(":welcome to sevrice for addhotel")
     
-    console.log("id is ins service",userID)
-    console.log("this is addhotel servcie hotelId is",data);
+    // console.log("id is ins service",userID)
+    // console.log("this is addhotel servcie hotelId is",data);
 
     const newHotel=await Hotel.create({
         ...data,
         createdBy:userID
        
     })
-    console.log("this si hotel return from service:",Hotel);
+    // console.log("this si hotel return from service:",Hotel);
 
     return newHotel;
        
@@ -80,14 +80,14 @@ export const addHotel=async(data,userID)=>{
 
 export const modifyHotel=async(id,data,userId)=>{
 
-    console.log("ID of hotel is ",id);
+    // console.log("ID of hotel is ",id);
 
     const existingHotel = await Hotel.findById(id);
     if (!existingHotel) {
         throw new Error("Hotel not found");
     }
-    console.log("existing htoel detials is:",existingHotel);
-    console.log("existing hotel created  by is",existingHotel.createdBy.id)
+    // console.log("existing htoel detials is:",existingHotel);
+    // console.log("existing hotel created  by is",existingHotel.createdBy.id)
     if (existingHotel.createdBy.toString() !== userId.toString()) {
         throw new Error("You are not authorized to update this hotel");
     }
@@ -104,7 +104,7 @@ export const modifyHotel=async(id,data,userId)=>{
 }
 
 export const adminHotels = async (userId) => {
-  console.log("User id got in adminHotels service:", userId);
+//   console.log("User id got in adminHotels service:", userId);
 
   if (!userId) {
     throw new Error("User ID is required");

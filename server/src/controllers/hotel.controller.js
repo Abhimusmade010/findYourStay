@@ -11,9 +11,9 @@ export const getAllHotels = async (req, res) => {
     const getCacheData=await redisClient.get(cacheKey);
 
     if(getCacheData){
-      console.log("Data from the redis fetched")
+      // console.log("Data from the redis fetched")
       return res.status(200).json({
-        message: "Hotels fetched (from cache)",
+        // message: "Hotels fetched (from cache)",
         result: JSON.parse(getCachedData)
       })
     }
@@ -25,9 +25,9 @@ export const getAllHotels = async (req, res) => {
       EX:60
 
     }) 
-    console.log("Data strored in cache(redis)");
+    // console.log("Data strored in cache(redis)");
 
-    console.log("inside getall hotels",result);
+    // console.log("inside getall hotels",result);
     res.status(200).json({                 //200 because for succes not 201 becuase nothing is creating 
       message: "Hotels fetched",
       result

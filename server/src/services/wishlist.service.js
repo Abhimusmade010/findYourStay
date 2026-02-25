@@ -32,7 +32,7 @@ export const addwishlistService=async(userId,hotelId)=>{
     }
 
     //push hotel in wishlist aarray for user 
-    console.log("wish list is",user.wishlist);
+    // console.log("wish list is",user.wishlist);
 
     user.wishlist.push(hotelId);
     await user.save();
@@ -52,8 +52,8 @@ export const getwishlistservice=async(userId)=>{
     // const wishlistArray = user.wishlist;
     const wishlistArray=await User.findById(userId).populate("wishlist")
 
-    console.log("wishlist is ",wishlistArray.wishlist);
-    console.log("user.wishlist is",user.wishlist);
+    // console.log("wishlist is ",wishlistArray.wishlist);
+    // console.log("user.wishlist is",user.wishlist);
     return wishlistArray.wishlist;
 
 
@@ -75,10 +75,10 @@ export const deletewishlistservice=async(userId,hotelId)=>{
         throw new Error("User not Found");
     }
 
-    console.log("wishlist befroe abhi delete is",user.wishlist);
+    // console.log("wishlist befroe abhi delete is",user.wishlist);
     user.wishlist = user.wishlist.filter(id => id.toString() !== hotelId);
 
-    console.log("wishlist after abhi deleted it",user.wishlist);
+    // console.log("wishlist after abhi deleted it",user.wishlist);
 
     await user.save();
     
