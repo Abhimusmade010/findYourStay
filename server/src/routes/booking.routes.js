@@ -16,3 +16,4 @@ router.post('/approve',authMiddleware,requireRole('Admin'),approveBookingControl
 router.get('/owned/confirmed',authMiddleware,requireRole('Admin'),getMyConfirmedBookingsController);
 
 export default router
+

@@ -2,26 +2,31 @@ import Booking from "../models/booking.model.js";
 import Hotel from "../models/hotel.model.js";
 import User from "../models/user.model.js"
 // import Booking from "../models/booking.model.js"
-
-
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
-export const getConfirmedBookingService=async(req,res)=>{
+
+
+export const getConfirmedBookingService=async(userId,bookingId)=>{
   // console.log("booking Id is ",bookingId);
   const booking = await Booking.findById(bookingId).populate("hotel");
   if(!booking){
     throw new Error("Booking not found")
   }
+
   if(booking.status!="Pending"){
     throw new Error("Only pending bookings can be approved")
   }
+
   if (String(booking.hotel.createdBy) !== String(userId)){
     throw new Error("Not authorized to approve this booking")
   }
+  
   const hotel = await Hotel.findById(booking.hotel._id,booking.status="Confirmed");
 
   return {booking,hotel}
 
+
 }
+
 
 export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}) => {
 
@@ -115,7 +120,8 @@ export const  approveBookingService=async(userId,bookingId)=>{
   }
   
   // console.log("hotel id in booking is",booking.hotel._id)
-  
+  // const hotel= await Hotel.findbyId(booking.hotel)
+  const hotel = booking.hotel;
   const dateRange = buildDateRangeArray(booking.checkIn, booking.checkOut);
 
   const overlaps = hotel.bookedDates.some(range => {

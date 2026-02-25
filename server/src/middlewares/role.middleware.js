@@ -2,7 +2,7 @@ export const requireRole = (role) => {
 
   return (req, res, next) => {
 
-    console.log("in requireROle")
+    // console.log("in requireROle")
     // console.log("in the require role")
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
     // console.log("role from requiest is ",role)

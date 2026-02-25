@@ -3,6 +3,8 @@ import User from "../models/user.model.js"
 import Hotel from "../models/hotel.model.js"
 //store wishlist data in wishlist array of the user model
 
+
+
 export const addwishlistService=async(userId,hotelId)=>{
 
     console.log("recieved data in add wishlist service is",userId);
@@ -44,6 +46,8 @@ export const addwishlistService=async(userId,hotelId)=>{
 }
 
 
+
+
 export const getwishlistservice=async(userId)=>{
     const user=await User.findById(userId);
     if(!user){
@@ -58,6 +62,8 @@ export const getwishlistservice=async(userId)=>{
 
 
 }
+
+
 
 export const deletewishlistservice=async(userId,hotelId)=>{
 
