@@ -35,12 +35,13 @@ export const createBookingcontroller=async (req,res)=>{
 
 export const getMyConfirmedBookingsController=async(req,res)=>{
     try{
-        const {bookingId}=req.body;
+        // const {bookingId}=req.body;
+
         const userId=req.user._id;
-        console.log("in getConfirmedBookingController booking id",bookingId)
+        // console.log("in getConfirmedBookingController booking id",bookingId)
         console.log("in getConfirmedBookingController user ID",userId)
         // const result=await approveBookingService(userId.bookingId);
-        const result=await getConfirmedBookingService(userId,bookingId);
+        const result=await getConfirmedBookingService(userId);
 
         res.status(200).json({
             result,

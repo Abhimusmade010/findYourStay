@@ -5,25 +5,24 @@ import User from "../models/user.model.js"
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
 
 
-export const getConfirmedBookingService=async(userId,bookingId)=>{
+export const getConfirmedBookingService=async(userId)=>{
   // console.log("booking Id is ",bookingId);
-  const booking = await Booking.findById(bookingId).populate("hotel");
-  if(!booking){
-    throw new Error("Booking not found")
-  }
-
-  if(booking.status!="Pending"){
-    throw new Error("Only pending bookings can be approved")
-  }
-
-  if (String(booking.hotel.createdBy) !== String(userId)){
-    throw new Error("Not authorized to approve this booking")
-  }
   
-  const hotel = await Hotel.findById(booking.hotel._id,booking.status="Confirmed");
+  //get the hotel created by the user Id
 
-  return {booking,hotel}
 
+  const hotels = await Hotel.find({ createdBy: userId });
+
+
+  const hotelIds = hotels.map(hotel => hotel._id);
+
+
+  const confirmedBookings = await Booking.find({
+    hotel: { $in: hotelIds },
+    status: "Confirmed"
+  }).populate("hotel customer");
+
+  return confirmedBookings;
 
 }
 
