@@ -4,7 +4,8 @@ import { createBookingService } from "../services/booking.service.js";
 import { getmyHotelsPendingBookingService } from "../services/booking.service.js";
 // import { getConfirmedBookingService } from "../services/booking.service.js";
 import { getConfirmedBookingService } from "../services/booking.service.js";
-
+import { getActiveBookingsForCustomerService } from "../services/booking.service.js";
+import { getBookingHistoryForCustomerService } from "../services/booking.service.js";
 export const createBookingcontroller=async (req,res)=>{
     try{
         const { hotelId, checkIn, checkOut } = req.body;
@@ -113,3 +114,29 @@ export const getmyHotelsPendingBookingController=async(req,res)=>{
 
 //     }
 // }
+
+export const getActiveBookingsForCustomerController = async (req, res) => {
+  try {
+    const customerId = req.user._id;
+    const result = await getActiveBookingsForCustomerService(customerId);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getBookingHistoryForCustomerController = async (req, res) => {
+  try {
+    const customerId = req.user._id;
+    const result = await getBookingHistoryForCustomerService(customerId);
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

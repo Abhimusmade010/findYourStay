@@ -5,6 +5,23 @@ import User from "../models/user.model.js"
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
 
 
+
+export const getActiveBookingsForCustomerService = async (customerId) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // "Active & Upcoming" = bookings that haven't ended yet.
+  // Includes Pending (waiting for admin approval) and Confirmed.
+  return await Booking.find({
+    customer: customerId,
+    status: { $in: ["Pending", "Confirmed"] },
+    checkOut: { $gte: today },
+  })
+    .populate("hotel")
+    .sort({ checkIn: 1 });
+};
+
+
 export const getConfirmedBookingService=async(userId)=>{
   // console.log("booking Id is ",bookingId);
   
@@ -188,3 +205,18 @@ export const getmyHotelsPendingBookingService=async(userId)=>{
 
 }
 
+export const getBookingHistoryForCustomerService = async (customerId) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  // "History" = anything ended in the past OR explicitly cancelled/completed.
+  return await Booking.find({
+    customer: customerId,
+    $or: [
+      { checkOut: { $lt: today } },
+      { status: { $in: ["Cancelled", "Completed"] } },
+    ],
+  })
+    .populate("hotel")
+    .sort({ checkIn: -1 });
+};

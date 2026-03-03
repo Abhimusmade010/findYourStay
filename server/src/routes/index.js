@@ -16,5 +16,6 @@ router.use("/bookings",bookingRoutes);
 router.use("/",wishlistRoutes);
 
 // app.use("/api/reviews",reviewRoutes);
+// 
 
 export default router
