@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../contexts/AuthContext'
 import { Button } from './ui/Button'
+import { useToast } from './ui/Toast'
 import { 
   Home, 
   Search, 
@@ -13,15 +15,37 @@ import {
   X,
   Building2,
   Calendar,
-  Star
+  Star,
+  Bell
 } from 'lucide-react'
+import { notificationsAPI } from '../lib/api'
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { user, logout, isAuthenticated } = useAuth()
+  const { success: showSuccess } = useToast()
+  const [lastUnread, setLastUnread] = useState(0)
   const location = useLocation()
   const navigate = useNavigate()
+
+  // periodically fetch notifications for toast alerts
+ const { data: notices = [] } = useQuery({
+  queryKey: ['notifications'],
+  queryFn: async () => (await notificationsAPI.getAll()).data.result,
+  enabled: isAuthenticated,
+  refetchInterval: 15000,
+  onSuccess: (data) => {
+    const unread = data.filter(n => !n.read).length;
+
+    if (unread > lastUnread) {
+      const diff = unread - lastUnread;
+      showSuccess(`You have ${diff} new notification${diff > 1 ? 's' : ''}`);
+    }
+
+    setLastUnread(unread);
+  }
+})
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,8 +59,14 @@ const Navigation = () => {
     { path: '/', label: 'Home', icon: Home },
     { path: '/hotels', label: 'Hotels', icon: Building2 },
     { path: '/bookings', label: 'Bookings', icon: Calendar },
+    // notifications link inserted below for authenticated users
     { path: '/wishlist', label: 'Wishlist', icon: Heart },
   ]
+
+  // if user is logged in, insert notification link before wishlist
+  if (isAuthenticated) {
+    navItems.splice(3, 0, { path: '/notifications', label: 'Notifications', icon: Bell });
+  }
 
   const handleLogout = () => {
     logout()
@@ -90,7 +120,12 @@ const Navigation = () => {
                         : 'text-muted-foreground hover:text-primary hover:bg-primary/5'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <div className="relative">
+                      <Icon className="w-4 h-4" />
+                      {item.path === '/notifications' && notices && notices.filter(n => !n.read).length > 0 && (
+                        <span className="absolute top-0 right-0 w-2 h-2 bg-destructive rounded-full" />
+                      )}
+                    </div>
                     <span>{item.label}</span>
                   </Link>
                 </motion.div>

@@ -78,4 +78,11 @@ export const wishlistAPI = {
   get: () => api.get('/wishlist'),
 }
 
+
+export const notificationsAPI = {
+  getAll: () => api.get('/notifications'),
+  markRead: (id) => api.patch(`/notifications/${id}/read`),
+}
+
+
 export default api

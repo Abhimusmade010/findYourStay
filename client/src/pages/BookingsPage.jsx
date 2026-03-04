@@ -15,12 +15,14 @@ export default function BookingsPage() {
 
   const { data: active = [] } = useQuery({
     queryKey: ['bookings', 'active'],
-    queryFn: async () => (await bookingsAPI.getActive()).data
+    queryFn: async () => (await bookingsAPI.getActive()).data,
+    refetchInterval: 15000,
   })
 
   const { data: history = [] } = useQuery({
     queryKey: ['bookings', 'history'],
-    queryFn: async () => (await bookingsAPI.getHistory()).data
+    queryFn: async () => (await bookingsAPI.getHistory()).data,
+    refetchInterval: 15000,
   })
 
   // NOTE: enabled is passed as an option to useQuery (not destructured)

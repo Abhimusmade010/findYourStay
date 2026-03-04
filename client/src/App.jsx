@@ -13,6 +13,7 @@ import NotFound from './pages/NotFound'
 import WishlistPage from './pages/WishlistPage'
 import BookingsPage from './pages/BookingsPage'
 import AdminDashboard from './pages/AdminDashboard'
+import NotificationsPage from './pages/NotificationsPage'
 
 function ProtectedRoute({ children, role }) {
   const { isAuthenticated, loading, user } = useAuth()
@@ -37,6 +38,7 @@ export default function App() {
           <Route path="/hotels/:id" element={<HotelDetailsPage />} />
           <Route path="/booking/:id" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
           <Route path="/bookings" element={<ProtectedRoute><BookingsPage /></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute><NotificationsPage /></ProtectedRoute>} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute role="Admin"><AdminDashboard /></ProtectedRoute>} />
