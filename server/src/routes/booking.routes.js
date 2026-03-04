@@ -16,10 +16,7 @@ const router=express.Router();
 
 router.post("/",authMiddleware,createBookingcontroller);
 
-
-
 router.get("/history", authMiddleware, getBookingHistoryForCustomerController);
-
 
 router.get("/active", authMiddleware, getActiveBookingsForCustomerController);
 
@@ -29,5 +26,9 @@ router.post('/approve',authMiddleware,requireRole('Admin'),approveBookingControl
 
 router.get('/owned/confirmed',authMiddleware,requireRole('Admin'),getMyConfirmedBookingsController);
 
+router.post("/:id/deny", authMiddleware, requireRole("Admin"), denyBookingController);
+
 export default router
+
+
 

@@ -6,7 +6,12 @@ import { getmyHotelsPendingBookingService } from "../services/booking.service.js
 import { getConfirmedBookingService } from "../services/booking.service.js";
 import { getActiveBookingsForCustomerService } from "../services/booking.service.js";
 import { getBookingHistoryForCustomerService } from "../services/booking.service.js";
+import { denyBookingService } from "../services/booking.service.js";
+
+
 export const createBookingcontroller=async (req,res)=>{
+
+
     try{
         const { hotelId, checkIn, checkOut } = req.body;
         const customerId=req.user._id;
@@ -133,6 +138,25 @@ export const getBookingHistoryForCustomerController = async (req, res) => {
     const customerId = req.user._id;
     const result = await getBookingHistoryForCustomerService(customerId);
     return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+export const denyBookingController = async (req, res) => {
+  try {
+    const adminUserId = req.user._id;
+    const bookingId = req.params.id;
+
+    const result = await denyBookingService(adminUserId, bookingId);
+    return res.status(200).json({
+      result,
+      message: "Booking denied",
+    });
   } catch (error) {
     return res.status(400).json({
       success: false,

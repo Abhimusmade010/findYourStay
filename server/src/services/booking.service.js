@@ -205,6 +205,7 @@ export const getmyHotelsPendingBookingService=async(userId)=>{
 
 }
 
+
 export const getBookingHistoryForCustomerService = async (customerId) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -219,4 +220,22 @@ export const getBookingHistoryForCustomerService = async (customerId) => {
   })
     .populate("hotel")
     .sort({ checkIn: -1 });
+};
+
+export const denyBookingService = async (adminUserId, bookingId) => {
+  const booking = await Booking.findById(bookingId).populate("hotel");
+  if (!booking) throw new Error("Booking not found");
+
+  if (booking.status !== "Pending") {
+    throw new Error("Only pending bookings can be denied");
+  }
+
+  if (String(booking.hotel.createdBy) !== String(adminUserId)) {
+    throw new Error("Not authorized to deny this booking");
+  }
+
+  booking.status = "Cancelled";
+  await booking.save();
+
+  return booking;
 };
