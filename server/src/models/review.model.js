@@ -10,6 +10,7 @@ import mongoose from "mongoose";
  * Design choice:
  * - One review per (hotel, customer). This keeps UI simple and prevents spam.
  */
+
 const reviewSchema = new mongoose.Schema(
   {
     hotel: {

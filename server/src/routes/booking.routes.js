@@ -21,7 +21,9 @@ router.get("/history", authMiddleware, getBookingHistoryForCustomerController);
 router.get("/active", authMiddleware, getActiveBookingsForCustomerController);
 
 // console.log("in the bookinf routebefore getmyHotelsPendingBookingController")
+
 router.get('/pending',authMiddleware,requireRole("Admin"),getmyHotelsPendingBookingController);
+
 router.post('/approve',authMiddleware,requireRole('Admin'),approveBookingController);
 
 router.get('/owned/confirmed',authMiddleware,requireRole('Admin'),getMyConfirmedBookingsController);
