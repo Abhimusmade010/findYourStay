@@ -5,6 +5,8 @@ import hotelRoutes from './hotel.routes.js'
 import reviewRoutes from './review.routes.js'
 import wishlistRoutes from './wishlist.routes.js'
 
+import notificationRoutes from './notification.routes.js'
+
 const router=express.Router();
 
 console.log("inside the index,js for routes!");
@@ -18,4 +20,5 @@ router.use("/",wishlistRoutes);
 router.use("/reviews",reviewRoutes);
 // 
 
+router.use("/notifications", notificationRoutes);
 export default router

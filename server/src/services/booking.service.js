@@ -167,6 +167,12 @@ export const  approveBookingService=async(userId,bookingId)=>{
 
     //now if user has added the hotel in wishlist first and booked and booking in approved then it should removed from the wishlist 
 
+     try {
+      const msg = `Your booking at ${hotel.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()} has been approved.`;
+      await createNotification(booking.customer, msg);
+    } catch (e) {
+      console.error("Failed to create approval notification", e.message);
+    }
 
     return {booking,hotel}
 
@@ -236,6 +242,13 @@ export const denyBookingService = async (adminUserId, bookingId) => {
 
   booking.status = "Cancelled";
   await booking.save();
+
+  try {
+    const msg = `Your booking at ${booking.hotel?.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()} has been denied.`;
+    await createNotification(booking.customer, msg);
+  } catch (e) {
+    console.error("Failed to create denial notification", e.message);
+  }
 
   return booking;
 };
