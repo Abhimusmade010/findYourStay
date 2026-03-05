@@ -14,6 +14,7 @@ export const signUpUser = async (req, res) => {
   }
 };
 
+
 export const loginUser = async (req, res) => {
   try {
     const data = req.body;
@@ -25,4 +26,3 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// export { signUpUser, loginUser };

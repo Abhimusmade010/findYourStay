@@ -40,8 +40,6 @@ export const getAllHotels = async (req, res) => {
 
 };
 
-
-
 export const searchHotel=async(req,res)=>{
 
   try{

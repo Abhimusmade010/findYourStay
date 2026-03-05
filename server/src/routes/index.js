@@ -9,16 +9,18 @@ import notificationRoutes from './notification.routes.js'
 
 const router=express.Router();
 
-console.log("inside the index,js for routes!");
-
+// console.log("inside the index,js for routes!");
 
 router.use("/auth", authRoutes);
+
 router.use("/hotels", hotelRoutes);
+
 router.use("/bookings",bookingRoutes);
+
 router.use("/",wishlistRoutes);
 
 router.use("/reviews",reviewRoutes);
-// 
 
 router.use("/notifications", notificationRoutes);
+
 export default router
