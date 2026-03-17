@@ -8,6 +8,7 @@ import { validate } from "../middlewares/validate.middleware.js";
 const router = express.Router();
 
 router.get("/hotel/:hotelId", getReviewsByHotelController);
+console.log("before add review controller")
 
 router.post("/", authMiddleware,validate(reviewSchemaforValidations),addReviewController);
 
