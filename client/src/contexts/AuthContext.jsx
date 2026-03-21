@@ -59,10 +59,19 @@ export const AuthProvider = ({ children }) => {
       setUser(newUser)
       return { success: true, user: newUser }
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Registration failed'
-      setError(errorMessage)
-      return { success: false, error: errorMessage }
-    }
+      // const errorMessage = err.response?.data?.message || 'Registration failed'
+      // setError(errorMessage)
+      // return { success: false, error: errorMessage }
+        const responseData = err.response?.data
+
+        setError(responseData?.message || 'Registration failed')
+
+        return {
+          success: false,
+          error: responseData?.message,
+          errors: responseData?.errors || []   // 🔥 THIS LINE FIXES EVERYTHING
+        }
+      }
   }
 
   const logout = () => {
