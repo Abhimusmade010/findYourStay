@@ -7,10 +7,13 @@ import { getmyHotelsPendingBookingController } from "../controllers/booking.cont
 import { getMyConfirmedBookingsController } from "../controllers/booking.controller.js";
 import {denyBookingController,getActiveBookingsForCustomerController,getBookingHistoryForCustomerController,} from "../controllers/booking.controller.js";
 
+import { cancelBookingController } from "../controllers/booking.controller.js";
 
 const router=express.Router();
 
-router.post("/",authMiddleware,createBookingcontroller);
+router.post("/:id/cancel", authMiddleware,requireRole("Customer"), cancelBookingController);
+
+router.post("/",authMiddleware,requireRole("Customer"),createBookingcontroller);
 
 router.get("/history", authMiddleware, getBookingHistoryForCustomerController);
 

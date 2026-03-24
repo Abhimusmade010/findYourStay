@@ -5,9 +5,7 @@ dotenv.config();
 
 import routes from './src/routes/index.js'
 
-
 const app = express();
-
 app.use(express.json());
 
 
@@ -19,8 +17,9 @@ app.use(cors({
   credentials: true
 }));
 
+
 app.use(express.urlencoded({ extended: true }));
-console.log("!!!!!!!!!!!! Welcome Developer to the APP !!!!!!!!!!!!!!!!!!!!!!!")
+console.log("!! Welcome Developer to the APP !!")
  
 
 app.use("/api", routes);

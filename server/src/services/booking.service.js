@@ -1,9 +1,35 @@
 import Booking from "../models/booking.model.js";
 import Hotel from "../models/hotel.model.js";
 import User from "../models/user.model.js"
-// import Booking from "../models/booking.model.js"
 import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
+import { createNotification } from "./notification.service.js";
 
+const PENDING_BOOKING_EXPIRY_MINUTES = Number(process.env.PENDING_BOOKING_EXPIRY_MINUTES || 30);
+
+const buildPendingExpiryDate = () => {
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + PENDING_BOOKING_EXPIRY_MINUTES);
+  return expiresAt;
+};
+
+const recalculateHotelAvailability = (hotel) => {
+  hotel.availability = hotel.bookedDates.length === 0;
+};
+
+const removeBookedDateRangeFromHotel = (hotel, checkIn, checkOut) => {
+  const bookingDates = buildDateRangeArray(checkIn, checkOut).map((date) => normalizeDate(date).getTime());
+
+  hotel.bookedDates = hotel.bookedDates.filter((range) => {
+    if (!Array.isArray(range) || range.length !== bookingDates.length) {
+      return true;
+    }
+
+    const normalizedRange = range.map((date) => normalizeDate(date).getTime());
+    return !normalizedRange.every((value, index) => value === bookingDates[index]);
+  });
+
+  recalculateHotelAvailability(hotel);
+};
 
 
 export const getActiveBookingsForCustomerService = async (customerId) => {
@@ -100,6 +126,7 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     checkOut: checkOutDate,
     totalPrice,
     status: "Pending",
+    expiresAt: buildPendingExpiryDate(),
   });
   // console.log("final boking is ",booking);
   //if bookking is done then remove this hotel from the wish list of the user 
@@ -161,8 +188,10 @@ export const  approveBookingService=async(userId,bookingId)=>{
 
     hotel.bookedDates.push(dateRange);
     hotel.availability = false;
+     recalculateHotelAvailability(hotel);
     await hotel.save();
     booking.status = "Confirmed";
+    booking.expiresAt = null;
     await booking.save();
 
     //now if user has added the hotel in wishlist first and booked and booking in approved then it should removed from the wishlist 
@@ -221,7 +250,7 @@ export const getBookingHistoryForCustomerService = async (customerId) => {
     customer: customerId,
     $or: [
       { checkOut: { $lt: today } },
-      { status: { $in: ["Cancelled", "Completed"] } },
+       { status: { $in: ["Cancelled", "Completed", "Expired"] } },
     ],
   })
     .populate("hotel")
@@ -241,6 +270,10 @@ export const denyBookingService = async (adminUserId, bookingId) => {
   }
 
   booking.status = "Cancelled";
+  //changes made 
+  booking.cancelledAt = new Date();
+  booking.cancellationReason = "Denied by admin";
+  booking.expiresAt = null;
   await booking.save();
 
   try {
@@ -251,4 +284,70 @@ export const denyBookingService = async (adminUserId, bookingId) => {
   }
 
   return booking;
+};
+
+
+export const cancelBookingService = async (customerId, bookingId) => {
+
+  const booking = await Booking.findById(bookingId).populate("hotel");
+  if (!booking) {
+    throw new Error("Booking not found");
+  }
+
+  if (String(booking.customer) !== String(customerId)) {
+    throw new Error("Not authorized to cancel this booking");
+  }
+
+  if (!["Pending", "Confirmed"].includes(booking.status)) {
+    throw new Error("Only pending or confirmed bookings can be cancelled");
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  if (booking.status === "Confirmed" && booking.checkIn <= today) {
+    throw new Error("Started bookings cannot be cancelled");
+  }
+
+  if (booking.status === "Confirmed") {
+    removeBookedDateRangeFromHotel(booking.hotel, booking.checkIn, booking.checkOut);
+    await booking.hotel.save();
+  }
+
+  booking.status = "Cancelled";
+  booking.cancelledAt = new Date();
+  booking.cancellationReason = "Cancelled by customer";
+  booking.expiresAt = null;
+  await booking.save();
+
+  return booking;
+};
+
+export const expirePendingBookingsService = async () => {
+  const now = new Date();
+
+  const expiredBookings = await Booking.find({
+    status: "Pending",
+    expiresAt: { $ne: null, $lte: now },
+  }).populate("hotel");
+
+  if (!expiredBookings.length) {
+    return { expiredCount: 0 };
+  }
+
+  for (const booking of expiredBookings) {
+    booking.status = "Expired";
+    booking.cancelledAt = now;
+    booking.cancellationReason = "Booking request expired before admin approval";
+    booking.expiresAt = null;
+    await booking.save();
+
+    try {
+      const msg = `Your booking at ${booking.hotel?.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()} expired because no admin action was taken in time.`;
+      await createNotification(booking.customer, msg);
+    } catch (error) {
+      console.error("Failed to create expiry notification", error.message);
+    }
+  }
+
+  return { expiredCount: expiredBookings.length };
 };

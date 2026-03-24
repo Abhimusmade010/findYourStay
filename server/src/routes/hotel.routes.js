@@ -20,6 +20,7 @@ router.post("/",authMiddleware,requireRole("Admin"),validate(createhotelSchema),
 router.put("/:id", authMiddleware, requireRole("Admin"),validate(createhotelSchema), updateHotelController);
 router.get("/mine/list", authMiddleware, requireRole("Admin"), getMyHotels);
 
-
 export default router;
+
+
 

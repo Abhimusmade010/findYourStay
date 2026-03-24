@@ -7,7 +7,27 @@ import { getConfirmedBookingService } from "../services/booking.service.js";
 import { getActiveBookingsForCustomerService } from "../services/booking.service.js";
 import { getBookingHistoryForCustomerService } from "../services/booking.service.js";
 import { denyBookingService } from "../services/booking.service.js";
+import { cancelBookingService } from "../services/booking.service.js";
 
+export const cancelBookingController = async (req, res) => {
+
+  try {
+    const customerId = req.user._id;
+    const bookingId = req.params.id;
+
+    const result = await cancelBookingService(customerId, bookingId);
+    return res.status(200).json({
+      result,
+      message: "Booking cancelled successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+  
+};
 
 export const createBookingcontroller=async (req,res)=>{
 

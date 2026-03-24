@@ -9,7 +9,13 @@ const bookingSchema = new mongoose.Schema({
   totalPrice: { type: Number, required: true },
 
 
-  status: { type: String, enum: ["Pending", "Confirmed", "Cancelled", "Completed"], default: "Pending" },
+   status: { type: String, enum: ["Pending", "Confirmed", "Cancelled", "Completed", "Expired"], default: "Pending" },
+
+    expiresAt: { type: Date, default: null },
+
+    cancelledAt: { type: Date, default: null },
+
+    cancellationReason: { type: String, default: null },
 
 
   customer: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },

@@ -1,7 +1,8 @@
 import { z } from "zod";
 
 export const createhotelSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  
+    name: z.string().min(1, "Name is required"),
   description: z.string().min(1, "Description is required"),
   location: z.object({
     city: z.string().optional(),
@@ -14,5 +15,7 @@ export const createhotelSchema = z.object({
   images: z.array(z.string()).optional(),
   availability: z.boolean().optional(),
   bookedDates: z.array(z.array(z.date())).optional(),
-  createdBy: z.string().regex(/^[a-f\d]{24}$/i, "Invalid user ID"),
+  createdBy: z.string().regex(/^[a-f\d]{24}$/i, "Invalid user ID")
+  
+  
 });
