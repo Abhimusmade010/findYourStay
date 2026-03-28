@@ -44,9 +44,9 @@ export const searchHotel=async(req,res)=>{
 
   try{
     const data= req.body;
-    console.log("Data from the searchh Hotel",data);
+    // console.log("Data from the searchh Hotel",data);
     const myhotels=await searchForHotel(data);
-    console.log("Data from teh serahcing ",myhotels);
+    // console.log("Data from teh serahcing ",myhotels);
     res.status(200).json(myhotels);
   }
   catch(error){
@@ -62,7 +62,7 @@ export const getoneHotel=async (req,res)=>{
 
     const hotel=await fetchHotel(data);
 
-    console.log("Hiotels details is",hotel);
+    // console.log("Hiotels details is",hotel);
 
 
     res.status(200).json({
@@ -76,31 +76,57 @@ export const getoneHotel=async (req,res)=>{
   }
 }
 
-export const createHotel=async(req,res)=>{
-  
-  try{
-    console.log("Request body is:",req.body);
-    console.log("request is",req)
+import { uploadToCloudinary } from "../utils/uploadService.js";
 
-    const data=req.body;
-    const userID=req.user._id;
-    console.log("data in controller is:",data);
+export const createHotel = async (req, res) => {
+  try {
+    const data = req.body;
+    const userID = req.user._id;
+    console.log("ine the controller")
+    console.log("data is ",data);
+    console.log("userID is",userID);
+    console.log("req.files is:",req.files);
 
-    const result=await addHotel(data,userID);
-    console.log("result is controller is:",result);
+    // Handle image uploads(max 5 images)
+
+    let imageUrls = [];
+    // if (req.files && req.files.length > 0) {
+    //   console.log("in the files if loop")
+    //   const filesToUpload = req.files.slice(0, 5);
+    //   imageUrls = await Promise.all(
+    //     filesToUpload.map(async (file) => {
+    //       return await uploadToCloudinary(file.buffer);
+    //     })
+    //   );
+    //   console.log("below uploadcloudinary function");
+    // }
+    if (req.files && req.files.length > 0){
+
+      const uploadPromises = req.files.map(file =>
+        uploadToCloudinary(file.buffer)
+      );
+
+      imageUrls = await Promise.all(uploadPromises);
+    }
+
+    console.log("images url",imageUrls);
+    console.log("data with images is:",data);
+    // Attach image URLs to data
+    data.images = imageUrls;
+
+    const result = await addHotel(data, userID);
     res.status(201).json({
       success: true,
       message: "Hotel created successfully",
       data: result
     });
-  }
-  catch(error){
+  } catch (error) {
     res.status(500).json({
-      success:false,
-      error:error.message
-    })
+      success: false,
+      error: error.message
+    });
   }
-}
+};
 
 // export const deleteHotel=async(req,res)=>{
 //   try{
@@ -118,6 +144,7 @@ export const createHotel=async(req,res)=>{
 
 //   }
 // }
+
 
 export const updateHotelController=async(req,res)=>{
   try{
@@ -150,10 +177,10 @@ export const updateHotelController=async(req,res)=>{
 export const getMyHotels=async(req,res)=>{
   try{
     const userId=req.user._id;
-    console.log("USer id from getmyHotels controller",userId);
+    // console.log("USer id from getmyHotels controller",userId);
 
     const result =await adminHotels(userId);
-    console.log("Result after service is:",result);
+    // console.log("Result after service is:",result);
     
     res.status(200).json({
       success:true,
