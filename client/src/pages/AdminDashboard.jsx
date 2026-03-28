@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/Card";
-import { data } from "react-router";
+// import { data } from "react-router";
 
 
 export default function AdminDashboard() {
@@ -42,8 +42,8 @@ export default function AdminDashboard() {
     
   });
 
-  console.log("hotels data is:",hotels);
-  console.log("data is ",data);
+  // console.log("hotels data is:",hotels);
+  // console.log("data is ",data);
 
   const createMutation = useMutation({
     mutationFn: async () => {
@@ -86,6 +86,7 @@ export default function AdminDashboard() {
       ...prev,
       amenities: prev.amenities.map((a, i) => (i === index ? value : a)),
     }));
+    
   const removeAmenity = (index) =>
     setForm((prev) => ({
       ...prev,
