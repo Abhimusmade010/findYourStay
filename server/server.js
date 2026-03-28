@@ -6,19 +6,26 @@ import { startPendingBookingExpiryJob } from "./src/jobs/pending-booking-expiry.
 const PORT=process.env.PORT || 3000;
 
 const startServer = async () => {
-  try {
+  try{
+
     await connectDB();
     await connectRedis();
     startPendingBookingExpiryJob();
+
     app.listen(PORT, () => {
       console.log(`✅ Server running on port ${PORT}`);
     });
+
   } 
   catch (error) {
+
     console.error("Server startup error:", error);
+
+    
   }
 
 };
+
 
 startServer();
 

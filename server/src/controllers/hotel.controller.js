@@ -88,10 +88,11 @@ export const createHotel=async(req,res)=>{
 
     const result=await addHotel(data,userID);
     console.log("result is controller is:",result);
-    res.status(200).json({
-      message:"Hotel created successfully",
-      data:result
-    })
+    res.status(201).json({
+      success: true,
+      message: "Hotel created successfully",
+      data: result
+    });
   }
   catch(error){
     res.status(500).json({
