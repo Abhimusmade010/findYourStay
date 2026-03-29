@@ -22,7 +22,7 @@ export const authMiddleware = async (req, res, next) => {
     // console.log("Token type:", typeof token);
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
-    console.log("payload is",payload)
+    // console.log("payload is",payload)
 
     const user = await User.findById(payload.userId).select("-passwordHash");
 

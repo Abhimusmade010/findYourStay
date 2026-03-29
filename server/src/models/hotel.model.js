@@ -23,7 +23,12 @@ const hotelSchema = new mongoose.Schema({
         required: true
     },
     amenities: [String],   //facilities
-    images: [String],
+    images: [
+        {
+            url:String,
+            public_id:String
+        }
+    ],
     availability: { type: Boolean,
          default: true 
     },

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { hotelsAPI } from "../lib/api";
 import { useToast } from "../components/ui/Toast";
@@ -26,9 +26,19 @@ export default function AdminDashboard() {
     country: "",
     address: "",
     amenities: [""],
-    images: "",
+    images: [],
   }
   const [form, setForm] = useState(initialFormState);
+  const fileInputRef = useRef(null);
+  // For preview URLs
+  const [imagePreviews, setImagePreviews] = useState([]);
+
+  // Clean up object URLs on unmount or when images change
+  useEffect(() => {
+    return () => {
+      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [imagePreviews]);
 
   const { data: hotels = [] } = useQuery({
     queryKey: ['hotels'],
@@ -42,33 +52,58 @@ export default function AdminDashboard() {
     
   });
 
-  // console.log("hotels data is:",hotels);
-  // console.log("data is ",data);
 
   const createMutation = useMutation({
-    mutationFn: async () => {
-      const payload = {
-        name: form.name,
-        description: form.description,
-        pricePerNight: Number(form.pricePerNight),
-        location: {
-          city: form.city,
-          state: form.state,
-          country: form.country,
-          address: form.address,
-        },
-        amenities: form.amenities.map((a) => a.trim()).filter(Boolean),
-        images: form.images
-          .split(",")
-          .map((u) => u.trim())
-          .filter(Boolean),
-      };
+    // mutationFn: async () => {
+    //   const payload = {
+    //     name: form.name,
+    //     description: form.description,
+    //     pricePerNight: Number(form.pricePerNight),
+    //     location: {
+    //       city: form.city,
+    //       state: form.state,
+    //       country: form.country,
+    //       address: form.address,
+    //     },
+    //     amenities: form.amenities.map((a) => a.trim()).filter(Boolean),
+    //     images: form.images
+    //       .split(",")
+    //       .map((u) => u.trim())
+    //       .filter(Boolean),
+    //   };
 
-      return await hotelsAPI.create(payload); // 🔥 YOU FORGOT THIS
+    //   return await hotelsAPI.create(payload); //  YOU FORGOT THIS
+    // },
+    mutationFn: async () => {
+      const formData = new FormData();
+
+      formData.append("name", form.name);
+      formData.append("description", form.description);
+      formData.append("pricePerNight", Number(form.pricePerNight));
+
+      formData.append("city", form.city);
+      formData.append("state", form.state);
+      formData.append("country", form.country);
+      formData.append("address", form.address);
+
+      // amenities (filter out empty)
+      form.amenities.filter((a) => a && a.trim()).forEach((a) => {
+        formData.append("amenities[]", a);
+      });
+
+      // images
+      if (form.images && form.images.length > 0) {
+        form.images.forEach((file) => {
+          formData.append("images", file);
+        });
+      }
+
+      return await hotelsAPI.create(formData);
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["hotels"] }); // also fix this
+      qc.invalidateQueries({ queryKey: ["hotels"] });
       setForm(initialFormState);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     },
     onError: (e) =>
       showError(e?.response?.data?.message || "Failed to create hotel")
@@ -86,7 +121,7 @@ export default function AdminDashboard() {
       ...prev,
       amenities: prev.amenities.map((a, i) => (i === index ? value : a)),
     }));
-    
+
   const removeAmenity = (index) =>
     setForm((prev) => ({
       ...prev,
@@ -176,12 +211,90 @@ export default function AdminDashboard() {
               ))}
             </div>
           </div>
-          <Input
+
+          {/* <Input
             name="images"
             placeholder="Image URLs (comma separated)"
             value={form.images}
             onChange={onChange}
-          />
+          /> */}
+          <div>
+            <div className="mb-2 text-sm text-muted-foreground">You can add up to 5 images</div>
+            <input
+              type="file"
+              name="images"
+              multiple
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={(e) => {
+                try {
+                  const newFiles = Array.from(e.target.files);
+                  setForm((prev) => {
+                    // Combine previous and new files, prevent duplicates by name+size
+                    const existing = prev.images || [];
+                    const allFiles = [...existing, ...newFiles];
+                    // Remove duplicates
+                    const uniqueFiles = [];
+                    const seen = new Set();
+                    for (const file of allFiles) {
+                      const key = file.name + file.size;
+                      if (!seen.has(key)) {
+                        seen.add(key);
+                        uniqueFiles.push(file);
+                      }
+                    }
+                    // Limit to 5
+                    if (uniqueFiles.length > 5) {
+                      alert("Maximum 5 images allowed");
+                      if (fileInputRef.current) fileInputRef.current.value = "";
+                      return { ...prev };
+                    }
+                    // Update previews
+                    setImagePreviews(uniqueFiles.map((file) => URL.createObjectURL(file)));
+                    return { ...prev, images: uniqueFiles };
+                  });
+                } catch (err) {
+                  console.error("File input error:", err);
+                }
+              }}
+            />
+            {/* Image preview and remove option */}
+            {form.images && form.images.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {form.images.map((file, idx) => (
+                  <div key={idx} className="relative w-20 h-20 border rounded overflow-hidden flex items-center justify-center bg-gray-100">
+                    {file.type.startsWith("image/") && imagePreviews[idx] ? (
+                      <img
+                        src={imagePreviews[idx]}
+                        alt={`preview-${idx}`}
+                        className="object-cover w-full h-full"
+                      />
+                    ) : (
+                      <span className="text-xs">{file.name}</span>
+                    )}
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-white bg-opacity-80 rounded-bl px-1 text-xs text-red-600 hover:bg-opacity-100"
+                      onClick={() => {
+                        setForm((prev) => {
+                          const newImages = prev.images.filter((_, i) => i !== idx);
+                          // Update previews
+                          setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== idx));
+                          // Also clear file input if all images removed
+                          if (newImages.length === 0 && fileInputRef.current) fileInputRef.current.value = "";
+                          return { ...prev, images: newImages };
+                        });
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+
           <Button
             variant="gradient"
             onClick={() => createMutation.mutate()}

@@ -24,6 +24,7 @@ export function validateDateRange(checkIn, checkOut) {
 // Track booked dates
 // Mark calendar unavailable
 // Store per-day availability
+
 export function buildDateRangeArray(startDate, endDate) {
   const arr = [];
   const cur = new Date(startDate);
