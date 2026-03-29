@@ -46,10 +46,14 @@ export const fetchHotel=async(data)=>{
 }
 
 export const addHotel=async(data,userID)=>{
+    console.log("Data in addHotel service is:",data);
+
     const newHotel=await Hotel.create({
         ...data,
         createdBy:userID
     })
+    console.log("New hotel created is:",newHotel);
+
     return newHotel;
 }
 

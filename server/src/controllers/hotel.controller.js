@@ -80,12 +80,30 @@ import { uploadToCloudinary } from "../utils/uploadService.js";
 
 export const createHotel = async (req, res) => {
   try {
-    const data = req.body;
+    // const data = req.body;
     const userID = req.user._id;
-    console.log("ine the controller")
-    console.log("data is ",data);
-    console.log("userID is",userID);
-    console.log("req.files is:",req.files);
+    const data = { ...req.body };
+    console.log("data in the controller",data);
+    console.log("userID in the controller is:",userID);
+
+    const formattedData = {
+      name: data.name,
+      description: data.description,
+      pricePerNight: Number(data.pricePerNight),
+      amenities: data.amenities,
+      location: {
+        city: data.city,
+        state: data.state,
+        country: data.country,
+        address: data.address
+      }
+    };
+
+// const result = await addHotel(formattedData, userID);
+    // console.log("ine the controller")
+    // console.log("data is ",data);
+    // console.log("userID is",userID);
+    // console.log("req.files is:",req.files);
 
     // Handle image uploads(max 5 images)
 
@@ -111,10 +129,13 @@ export const createHotel = async (req, res) => {
 
     console.log("images url",imageUrls);
     console.log("data with images is:",data);
-    // Attach image URLs to data
-    data.images = imageUrls;
 
-    const result = await addHotel(data, userID);
+    // Attach image URLs to data
+    formattedData.images = imageUrls;
+    console.log("data after attaching images is:",formattedData);
+    const result = await addHotel(formattedData, userID);
+
+    console.log("result from service is:",result);
     res.status(201).json({
       success: true,
       message: "Hotel created successfully",

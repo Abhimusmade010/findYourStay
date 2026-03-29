@@ -32,7 +32,8 @@ export const uploadToCloudinary = (buffer) => {
         }
         console.log("Cloudinary upload result:", result);
         resolve({
-          url: result.secure_url
+          url: result.secure_url,
+          public_id: result.public_id
         });
 
         //later store the public_id in the database for deleting the image from cloudinary when hotel is deleted or image is updated
