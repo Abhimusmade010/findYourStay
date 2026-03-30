@@ -43,9 +43,9 @@ export const authAPI = {
 
 // Hotels API
 export const hotelsAPI = {
-  getAll: () => api.get('/hotels/'),
+  getAll: () => api.get('/hotels/getHotels'),
   
-  getById: (id) => api.get(`/hotels/${id}`),
+  getById: (id) => api.get(`/hotels/gethotelDetails/${id}`),
   search: (searchParams) => api.post('/hotels/search',searchParams),
   
   // create: (data) => api.post('/hotels', data),
@@ -78,11 +78,11 @@ export const reviewsAPI = {
   getByHotel: (hotelId) => api.get(`/reviews/hotel/${hotelId}`),
 }
 
-// Wishlist API
+//Wishlist API
 export const wishlistAPI = {
-  add: (hotelId) => api.post('/wishlist', { hotelId }),
-  remove: (hotelId) => api.delete('/wishlist', { data: { hotelId } }),
-  get: () => api.get('/wishlist'),
+  add: (hotelId) => api.post('/wishlists/addtowishlist', { hotelId }),
+  remove: (hotelId) => api.delete('/wishlists/deletewishlist', { data: { hotelId } }),
+  get: () => api.get('/wishlists/getwishlist'),
 }
 
 
