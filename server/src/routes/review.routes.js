@@ -8,7 +8,7 @@ import { requireRole } from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
-router.get("/hotel/:hotelId", getReviewsByHotelController);
+router.get("/getreviewsforHotel/:hotelId", getReviewsByHotelController);
 console.log("before add review controller")
 
 router.post("/", authMiddleware,requireRole("Customer"),validate(reviewSchemaforValidations),addReviewController);

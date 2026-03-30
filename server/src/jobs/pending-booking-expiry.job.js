@@ -1,6 +1,11 @@
 import { expirePendingBookingsService } from "../services/booking.service.js";
 
-const JOB_INTERVAL_MINUTES = Number(process.env.PENDING_BOOKING_EXPIRY_JOB_MINUTES || 5);
+//i want to cancel the booking after 24 hours of the booking creation if the booking is still in pending state and 
+// also send a notification to the customer about the cancellation of the booking due to expiry of the pending state and
+// also update the availability of the hotel rooms accordinglyj
+
+const JOB_INTERVAL_MINUTES = Number(process.env.PENDING_BOOKING_EXPIRY_JOB_MINUTES || 60); 
+
 
 export const startPendingBookingExpiryJob = () => {
   const runExpiryCheck = async () => {

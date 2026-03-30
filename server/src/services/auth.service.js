@@ -10,17 +10,17 @@ const registerUser = async (data) => {
   const { name, email, password, role } = data;
 
   if (!name || !email || !password) {
-    throw new Error("Name, email and password are required");
+    throw new Error("VALIDATION_ERROR");
   }
-  console.log("in servooce layer of singup")
+  // console.log("in servooce layer of singup")
 
   const existingUser = await User.findOne({ email });
   if (existingUser) {
-    throw new Error("User already exists with this email");
+    throw new Error("EMAIL_EXISTS");
   }
 
   if (password.length < 6) {
-    throw new Error("Password must be at least 6 characters");
+    throw new Error("WEAK_PASSWORD");
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
@@ -51,12 +51,12 @@ const logUser = async (data) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    throw new Error("User not found");
+    throw new Error("USER_NOT_FOUND");
   }
 
   const isMatch = await bcrypt.compare(password, user.passwordHash);
   if (!isMatch) {
-    throw new Error("Invalid password");
+    throw new Error("VALIDATION_ERROR");
   }
 
   const token = jwt.sign(
