@@ -24,7 +24,9 @@ const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { user, logout, isAuthenticated } = useAuth()
-  const { success: showSuccess } = useToast()
+  // const { success: showSuccess } = useToast()
+  const { success: showSuccess, error: showError } = useToast();
+
   const [lastUnread, setLastUnread] = useState(0)
   const location = useLocation()
   const navigate = useNavigate()
@@ -69,7 +71,16 @@ const Navigation = () => {
   }
 
   const handleLogout = () => {
-    logout()
+    try{
+      logout()
+      showSuccess("Logged out successfully!");  
+    }
+    catch(error){
+      // console.error("Logout failed:", error);
+      showError("Logout failed. Please try again.");
+    }
+    // logout()
+    // showSuccess("Logged out successfully!");
     setIsMobileMenuOpen(false)
   }
 
@@ -96,7 +107,7 @@ const Navigation = () => {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <Building2 className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold text-gradient">LuxStay</span>
+              <span className="text-xl font-bold text-gradient">FindYourStay</span>
             </Link>
           </motion.div>
 

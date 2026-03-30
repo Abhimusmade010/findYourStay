@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setError(null)
+
       const response = await authAPI.login({ email, password })
       const { token, user: userData } = response.data
       
