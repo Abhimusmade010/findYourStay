@@ -3,6 +3,8 @@ import { useAuth } from '../contexts/AuthContext'
 import { useNavigate, Link } from 'react-router-dom'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
+import { PasswordInput } from '../components/ui/PasswordInput'
+import { useToast } from '../components/ui/Toast'
 
 export default function LoginPage() {
   const { login, error, clearError } = useAuth()
@@ -11,17 +13,28 @@ export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const { success, error: showError } = useToast()
+  // const { error: showError } = useToast();
+  
 
   const onSubmit = async (e) => {
     e.preventDefault()
     setLoading(true)
     const res = await login(email, password)
     setLoading(false)
+    // showError(error || "Login failed. Please try again."  );
+
     if (res.success) {
+      success("Logged in successfully!")
+
       if (res.user?.role === 'Admin') navigate('/admin')
       else navigate('/')
     }
+    else{
+      showError(res.error || "Login failed. Please try again.");
+    }
   }
+  
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-6">
@@ -32,13 +45,25 @@ export default function LoginPage() {
           <label className="block text-sm mb-1">Email</label>
           <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} onFocus={clearError} required />
         </div>
-        <div>
+        {/* <div>
           <label className="block text-sm mb-1">Password</label>
           <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} onFocus={clearError} required />
+        </div> */}
+
+        <div>
+          <label className="block text-sm mb-1">Password</label>
+          <PasswordInput
+            value={password}
+            onChange={setPassword}
+            onFocus={clearError}
+            required
+          />
         </div>
+
         <Button type="submit" className="w-full" variant="gradient" disabled={loading}>
           {loading ? 'Signing in...' : 'Sign In'}
         </Button>
+
         <p className="text-sm text-center text-muted-foreground">
           New here? <Link to="/register" className="text-primary">Create an account</Link>
         </p>

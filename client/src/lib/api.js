@@ -75,7 +75,7 @@ export const bookingsAPI = {
 // Reviews API
 export const reviewsAPI = {
   add: (reviewData) => api.post('/reviews', reviewData),
-  getByHotel: (hotelId) => api.get(`/reviews/hotel/${hotelId}`),
+  getByHotel: (hotelId) => api.get(`/reviews/getreviewsforHotel/${hotelId}`),
 }
 
 //Wishlist API
