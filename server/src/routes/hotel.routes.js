@@ -10,9 +10,9 @@ const router = express.Router();
 
 
 
-router.get("/",getAllHotels);
+router.get("/getHotels",getAllHotels);
 router.post('/search',searchHotel);
-router.get('/:id',getoneHotel);
+router.get('/gethotelDetails/:id',getoneHotel);
 
 //admin routes
 

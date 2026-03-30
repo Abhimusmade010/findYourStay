@@ -4,10 +4,10 @@ import bookingRoutes from './booking.routes.js'
 import hotelRoutes from './hotel.routes.js'
 import reviewRoutes from './review.routes.js'
 import wishlistRoutes from './wishlist.routes.js'
-
 import notificationRoutes from './notification.routes.js'
 
 const router=express.Router();
+
 
 router.use("/auth", authRoutes);
 
@@ -15,7 +15,7 @@ router.use("/hotels", hotelRoutes);
 
 router.use("/bookings",bookingRoutes);
 
-router.use("/",wishlistRoutes);
+router.use("/wishlists",wishlistRoutes);
 
 router.use("/reviews",reviewRoutes);
 

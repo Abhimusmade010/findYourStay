@@ -128,6 +128,8 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     status: "Pending",
     expiresAt: buildPendingExpiryDate(),
   });
+
+
   // console.log("final boking is ",booking);
   //if bookking is done then remove this hotel from the wish list of the user 
   // we have booklist array field in user schema 
@@ -135,6 +137,16 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
 
   // check first if the hotel user is booking is present in the wishlist if present remove it 
   // const hotelWishListArray=User.wishlist
+  
+  // sent notification to hotel admin that some one has booked the hotel and waiting for approval
+  try {
+    const msg = `You have a new booking request for ${hotel.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()}. Please review and approve or deny the booking.`;
+    await createNotification(hotel.createdBy, msg);
+  } catch (e) { 
+    console.error("Failed to create booking notification for admin", e.message);
+  }
+
+
   await User.findByIdAndUpdate(
     customerId,
     {
@@ -142,8 +154,6 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     },
     { new: true }
   );
-
-  // console.log("booking now with updated wishlist",user)
   
   return booking;
 };

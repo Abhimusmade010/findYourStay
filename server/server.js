@@ -1,4 +1,4 @@
-import app from "./app.js"
+import app from "./app.js                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     "
 import { connectDB } from "./src/config/db.js";
 import {connectRedis} from "./src/config/redis.js"
 import { startPendingBookingExpiryJob } from "./src/jobs/pending-booking-expiry.job.js";
@@ -20,14 +20,9 @@ const startServer = async () => {
   catch (error) {
 
     console.error("Server startup error:", error);
-
-    
   }
-
-};
-
-
+}; 
 startServer();
-
+        
 
 
