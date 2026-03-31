@@ -23,7 +23,6 @@ export const searchForHotel=async(data)=>{
 
     if(!myhotels.length) {    
         throw new Error({ message: "No hotels found for the given location" });
-        //return res.status(404).json({ message: "No hotels found for the given location" });
     }
     return{
         myhotels
@@ -46,13 +45,12 @@ export const fetchHotel=async(data)=>{
 }
 
 export const addHotel=async(data,userID)=>{
-    console.log("Data in addHotel service is:",data);
-
+    
     const newHotel=await Hotel.create({
         ...data,
         createdBy:userID
     })
-    console.log("New hotel created is:",newHotel);
+    
 
     return newHotel;
 }
@@ -74,14 +72,14 @@ export const addHotel=async(data,userID)=>{
 
 export const modifyHotel=async(id,data,userId)=>{
 
-    // console.log("ID of hotel is ",id);
 
     const existingHotel = await Hotel.findById(id);
+
     if (!existingHotel) {
         throw new Error("Hotel not found");
     }
-    // console.log("existing htoel detials is:",existingHotel);
-    // console.log("existing hotel created  by is",existingHotel.createdBy.id)
+
+
     if (existingHotel.createdBy.toString() !== userId.toString()) {
         throw new Error("You are not authorized to update this hotel");
     }
@@ -94,18 +92,25 @@ export const modifyHotel=async(id,data,userId)=>{
             new:true
         }
     );
+
     return updated;
 }
 
 export const adminHotels = async (userId) => {
-//   console.log("User id got in adminHotels service:", userId);
 
   if (!userId) {
-    throw new Error("User ID is required");
+    throw new Error("UserID is required");
   }
 
-  const result = await Hotel.find({ createdBy: userId }).populate("createdBy", "name email role");      // optional
+  const result = await Hotel.find(
+    { 
+        createdBy: userId 
+    })
+    .populate("createdBy", "name email role");      // optional
+
+
   return result;
+
 };
 
 

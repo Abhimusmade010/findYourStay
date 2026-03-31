@@ -6,7 +6,7 @@ import { redisClient } from "../config/redis.js";
 export const getAllHotels = async (req, res) => {
 
   try {
-
+    
     const cacheKey="all_hotels";
     const getCacheData=await redisClient.get(cacheKey);
 
@@ -14,6 +14,8 @@ export const getAllHotels = async (req, res) => {
       // console.log("Data from the redis fetched")
       return res.status(200).json({
         // message: "Hotels fetched (from cache)",
+        status: "success",
+        message: "Hotels fetched from cache",
         result: JSON.parse(getCachedData)
       })
     }
@@ -27,15 +29,19 @@ export const getAllHotels = async (req, res) => {
     }) 
     // console.log("Data strored in cache(redis)");
 
-    // console.log("inside getall hotels",result);
-    res.status(200).json({                 //200 because for succes not 201 becuase nothing is creating 
-      message: "Hotels fetched",
+    console.log("inside getall hotels",result);
+    res.status(200).json({   //200 because for succes not 201 becuase nothing is creating 
+      // status: "success",   
+      // message: "Hotels fetched from database",
       result
     });
 
 
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    res.status(400).json({ 
+      status: "error",
+      error: error.message 
+    });
   }
 
 };
@@ -50,7 +56,21 @@ export const searchHotel=async(req,res)=>{
     res.status(200).json(myhotels);
   }
   catch(error){
-    res.status(500).json({ message: error.message });
+
+    //no data found for the given location
+    if(error.message === "No hotels found for the given location"){
+      return res.status(404).json({
+        status: "error",
+        message: error.message
+      });
+    }
+      res.status(400).json({
+        status: "error",
+        message: error.message
+      }); 
+
+
+    // res.status(500).json({ message: error.message });
   }
 
 }
@@ -65,13 +85,24 @@ export const getoneHotel=async (req,res)=>{
 
 
     res.status(200).json({
+      status: "success",
       message:"Hotels",
       hotel
     })
   }catch(error){
+
+    //no hotel found for the given id
+    if(error.message === "No Hotel Found"){
+      return res.status(404).json({
+        status: "error",
+        message: error.message
+      });
+    }
     res.status(400).json({
-      error:error.message
-    })
+      status: "error",
+      message: error.message
+    }); 
+
   }
 }
 
@@ -81,9 +112,9 @@ export const createHotel = async (req, res) => {
   try {
     // const data = req.body;
     const userID = req.user._id;
-    const data = { ...req.body };
-    console.log("data in the controller",data);
-    console.log("userID in the controller is:",userID);
+    const data = { ...req.body};
+
+
 
     const formattedData = {
       name: data.name,
@@ -107,6 +138,7 @@ export const createHotel = async (req, res) => {
     // Handle image uploads(max 5 images)
 
     let imageUrls = [];
+
     // if (req.files && req.files.length > 0) {
     //   console.log("in the files if loop")
     //   const filesToUpload = req.files.slice(0, 5);
@@ -117,6 +149,7 @@ export const createHotel = async (req, res) => {
     //   );
     //   console.log("below uploadcloudinary function");
     // }
+
     if (req.files && req.files.length > 0){
 
       const uploadPromises = req.files.map(file =>
@@ -140,7 +173,9 @@ export const createHotel = async (req, res) => {
       message: "Hotel created successfully",
       data: result
     });
+
   } catch (error) {
+
     res.status(500).json({
       success: false,
       error: error.message
@@ -173,20 +208,32 @@ export const updateHotelController=async(req,res)=>{
     const data=req.body;
     const userID=req.user._id;
 
-    console.log("id in cotnrolller is:",id)
-    console.log("data is controller is:",data);
-    console.log("userId",userID);
-
     const result=await modifyHotel(id,data,userID);
 
-    console.log(":updated reuslt:",result);
     res.status(200).json({
       success: true,
       message: "Hotel updated successfully!",
       data: result
     });
 
-  }catch(error){
+  }
+  catch(error){
+
+    if(error.message === "Hotel not found"){
+      return res.status(404).json({
+        success: false,
+        message: error.message
+      });
+    } 
+
+    //logged in but not authorized user to update the hotel details and 401 not logged in user
+    if(error.message === "You are not authorized to update this hotel"){
+      return res.status(403).json({
+        success: false,
+        message: error.message
+      });
+    } 
+
      res.status(400).json({
       success: false,
       message: error.message
@@ -197,21 +244,29 @@ export const updateHotelController=async(req,res)=>{
 export const getMyHotels=async(req,res)=>{
   try{
     const userId=req.user._id;
-    // console.log("USer id from getmyHotels controller",userId);
 
     const result =await adminHotels(userId);
-    // console.log("Result after service is:",result);
     
     res.status(200).json({
       success:true,
       message:"Hotel fetched for admin",
       result
     })
-    // console.log("Response is:", );
+
+    
   }catch(error){
+
+    if(error.message === "UserID is required"){
+      return res.status(400).json({
+        success: false,
+        message: error.message
+      });
+    }
+
     res.status(400).json({
       success: false,
       message: error.message
     });
+
   }
 }

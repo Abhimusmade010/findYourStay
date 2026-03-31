@@ -64,6 +64,7 @@ const logUser = async (data) => {
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
   );
+  
   console.log("Generated token:", token);
   console.log("Dot count at login:", token.split(".").length - 1);
 

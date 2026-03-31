@@ -10,7 +10,8 @@ const router = express.Router();
 
 
 //customer routes
-router.get("/getHotels",getAllHotels);
+router.get("/",getAllHotels);
+
 // route for searching the hotels based on the criteria provided by the user
 router.post('/search',searchHotel);
 // route for getting the details of the hotel when the user clicks on the hotel from the search result or from the home page
