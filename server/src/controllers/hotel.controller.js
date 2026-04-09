@@ -1,43 +1,44 @@
 // import hotelModel from "../models/hotel.model.js";
 import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel,adminHotels} from "../services/hotel.service.js"
 import { redisClient } from "../config/redis.js";
+import { uploadToCloudinary } from "../utils/uploadService.js";
+
 
 
 export const getAllHotels = async (req, res) => {
-
   try {
-    
     const cacheKey="all_hotels";
     const getCacheData=await redisClient.get(cacheKey);
 
     if(getCacheData){
-      // console.log("Data from the redis fetched")
       return res.status(200).json({
-        // message: "Hotels fetched (from cache)",
         status: "success",
         message: "Hotels fetched from cache",
-        result: JSON.parse(getCachedData)
+        result: JSON.parse(getCacheData)
       })
     }
     
-    // await redisClient.del("all_hotels");
-    //if not in redis ftecht from  mongoDB and store in redis for further fetching
+    
+    // if cache miss then fetch from database
     const result=await fetchHotels();
+
+    //store in redis with an expiry time of 5 mins
     await redisClient.set(cacheKey,JSON.stringify(result),{
-      EX:60
-
+      EX:300        //expire in 5 mins
     }) 
-    // console.log("Data strored in cache(redis)");
 
-    console.log("inside getall hotels",result);
-    res.status(200).json({   //200 because for succes not 201 becuase nothing is creating 
-      // status: "success",   
-      // message: "Hotels fetched from database",
-      result
+
+    //200 because for succes not 201 becuase nothing is creating here we are just fetching the data from the database
+    res.status(200).json({   
+      status: "success",   
+      message: "Hotels fetched from database",
+      result  
     });
 
 
-  } catch (error) {
+  } 
+  // catch any error that occurs during the process and send a 400 bad request response with the error message
+  catch (error) {
     res.status(400).json({ 
       status: "error",
       error: error.message 
@@ -46,6 +47,7 @@ export const getAllHotels = async (req, res) => {
 
 };
 
+
 export const searchHotel=async(req,res)=>{
 
   try{
@@ -53,8 +55,15 @@ export const searchHotel=async(req,res)=>{
     // console.log("Data from the searchh Hotel",data);
     const myhotels=await searchForHotel(data);
     // console.log("Data from teh serahcing ",myhotels);
-    res.status(200).json(myhotels);
+
+
+    res.status(200).json({
+      status: "success",
+      message: "Hotels fetched based on search criteria",
+      myhotels
+    });
   }
+
   catch(error){
 
     //no data found for the given location
@@ -64,16 +73,16 @@ export const searchHotel=async(req,res)=>{
         message: error.message
       });
     }
-      res.status(400).json({
-        status: "error",
-        message: error.message
-      }); 
 
 
+    res.status(400).json({
+      status: "error",
+      message: error.message
+    });  
     // res.status(500).json({ message: error.message });
   }
-
 }
+
 
 export const getoneHotel=async (req,res)=>{
   try{
@@ -106,7 +115,7 @@ export const getoneHotel=async (req,res)=>{
   }
 }
 
-import { uploadToCloudinary } from "../utils/uploadService.js";
+
 
 export const createHotel = async (req, res) => {
   try {
@@ -243,9 +252,10 @@ export const updateHotelController=async(req,res)=>{
 
 export const getMyHotels=async(req,res)=>{
   try{
+    
     const userId=req.user._id;
-
     const result =await adminHotels(userId);
+  
     
     res.status(200).json({
       success:true,
@@ -269,4 +279,5 @@ export const getMyHotels=async(req,res)=>{
     });
 
   }
+
 }

@@ -3,7 +3,19 @@ import Hotel from "../models/hotel.model.js";
 import Review from "../models/review.model.js";
 
 export const createReviewService = async ({ hotelId, customerId, rating, comment }) => {
+
+  const parsedRating = Number(rating);
+  if (!Number.isFinite(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+    throw new Error("rating must be a number between 1 and 5");
+  }
+
+  if (!comment || typeof comment !== "string" || !comment.trim()) {
+    throw new Error("comment is required");
+  }
+
+
   const hotelExists = await Hotel.exists({ _id: hotelId });
+
   if (!hotelExists) throw new Error("Hotel not found");
 
   const today = new Date();

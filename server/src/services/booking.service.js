@@ -198,7 +198,7 @@ export const  approveBookingService=async(userId,bookingId)=>{
 
     hotel.bookedDates.push(dateRange);
     hotel.availability = false;
-     recalculateHotelAvailability(hotel);
+    recalculateHotelAvailability(hotel);
     await hotel.save();
     booking.status = "Confirmed";
     booking.expiresAt = null;

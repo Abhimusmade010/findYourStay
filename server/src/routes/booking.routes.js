@@ -19,22 +19,22 @@ router.post("/:id/cancel", authMiddleware,requireRole("Customer"), cancelBooking
 
 
 // route for the customer to create a booking for the hotel
-router.post("/",authMiddleware,requireRole("Customer"),createBookingcontroller);
+router.post("/create-booking",authMiddleware,requireRole("Customer"),createBookingcontroller);
 
 
 // route for the customer to get the confirmed bookings by the admin for the hotels they have booked
-router.get("/history", authMiddleware, getBookingHistoryForCustomerController);
+router.get("/gethistoryforCustomer", authMiddleware, getBookingHistoryForCustomerController);
 
 
 // route for the admin to approve the booking of the customer for the hotel
-router.get("/active", authMiddleware, getActiveBookingsForCustomerController);
+router.get("/getactiveforCustomer", authMiddleware, getActiveBookingsForCustomerController);
+
 
 
 // route for the admin to get the pending bookings of the hotels they own
-router.get('/pending',authMiddleware,requireRole("Admin"),getmyHotelsPendingBookingController);
+router.get('/getpendingforAdmin',authMiddleware,requireRole("Admin"),getmyHotelsPendingBookingController);
 
-
-// route for the admin to get the confirmed bookings of the hotels they own
+//approve booking by admin
 router.post('/approve',authMiddleware,requireRole('Admin'),approveBookingController);
 
 
