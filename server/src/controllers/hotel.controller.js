@@ -176,9 +176,12 @@ export const createHotel = async (req, res) => {
     console.log("data after attaching images is:",formattedData);
     const result = await addHotel(formattedData, userID);
 
+    await redisClient.del("all_hotels"); //delete the cache for all hotels when a new hotel is added so that next time when we fetch all hotels it will fetch from database and update the cache with new data
+    
     console.log("result from service is:",result);
     res.status(201).json({
-      success: true,
+      // success: true,.
+      status: "success",
       message: "Hotel created successfully",
       data: result
     });
@@ -186,7 +189,9 @@ export const createHotel = async (req, res) => {
   } catch (error) {
 
     res.status(500).json({
-      success: false,
+      // success: false,
+      status: "error",
+      message: "Failed to create hotel",
       error: error.message
     });
   }
@@ -218,9 +223,10 @@ export const updateHotelController=async(req,res)=>{
     const userID=req.user._id;
 
     const result=await modifyHotel(id,data,userID);
-
+    await redisClient.del("all_hotels"); //delete the cache for all hotels when a hotel is updated so that next time when we fetch all hotels it will fetch from database and update the cache with new data
     res.status(200).json({
-      success: true,
+      // success: true,
+      status: "success",
       message: "Hotel updated successfully!",
       data: result
     });
@@ -230,7 +236,8 @@ export const updateHotelController=async(req,res)=>{
 
     if(error.message === "Hotel not found"){
       return res.status(404).json({
-        success: false,
+        // success: false,
+        status: "error",
         message: error.message
       });
     } 
@@ -238,13 +245,15 @@ export const updateHotelController=async(req,res)=>{
     //logged in but not authorized user to update the hotel details and 401 not logged in user
     if(error.message === "You are not authorized to update this hotel"){
       return res.status(403).json({
-        success: false,
+        // success: false,
+        status: "error",
         message: error.message
       });
     } 
 
      res.status(400).json({
-      success: false,
+      // success: false,
+      status: "error",
       message: error.message
     });
   }
@@ -258,7 +267,8 @@ export const getMyHotels=async(req,res)=>{
   
     
     res.status(200).json({
-      success:true,
+      // success:true,
+      status: "success",
       message:"Hotel fetched for admin",
       result
     })
@@ -268,13 +278,15 @@ export const getMyHotels=async(req,res)=>{
 
     if(error.message === "UserID is required"){
       return res.status(400).json({
-        success: false,
+        // success: false,
+        status: "error",
         message: error.message
       });
     }
 
     res.status(400).json({
-      success: false,
+      // success: false,
+      status: "error",
       message: error.message
     });
 
