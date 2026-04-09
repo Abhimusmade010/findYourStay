@@ -49,18 +49,11 @@ export const addwishlistService=async(userId,hotelId)=>{
 
 
 export const getwishlistservice=async(userId)=>{
-    const user=await User.findById(userId);
+    const user=await User.findById(userId).populate("wishlist");
     if(!user){
         throw new Error("user not found");
     }
-    // const wishlistArray = user.wishlist;
-    const wishlistArray=await User.findById(userId).populate("wishlist")
-
-    // console.log("wishlist is ",wishlistArray.wishlist);
-    // console.log("user.wishlist is",user.wishlist);
-    return wishlistArray.wishlist;
-
-
+    return user.wishlist;
 }
 
 

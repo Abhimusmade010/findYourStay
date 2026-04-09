@@ -1,4 +1,3 @@
-import { success } from "zod";
 import { registerUser, logUser } from "../services/auth.service.js";
 
 // controller for handling user registration and login
@@ -9,12 +8,12 @@ export const signUpUser = async (req, res) => {
     const result = await registerUser(data);
 
 
-      // send success response with user data and token in REST format
-      res.status(201).json({
-        status: "success",
-        message: "User registered successfully",
-        result: result  
-      }); 
+    // send success response with user data and token in REST format
+    res.status(201).json({
+      status: "success",
+      message: "User registered successfully",
+      result: result
+    });
 
 
   }
@@ -27,7 +26,7 @@ export const signUpUser = async (req, res) => {
       return res.status(409).json({
         status: "error",
         message: "Email already exists",
-        error: error.message 
+        error: error.message
 
       });
     }
@@ -57,7 +56,7 @@ export const signUpUser = async (req, res) => {
       error: error.message
 
     });
-  
+
   }
 };
 
@@ -67,30 +66,30 @@ export const loginUser = async (req, res) => {
     // extract login credentials from request body
     const data = req.body;
     const result = await logUser(data);
-  
-      // send success response with user data and token in REST format
-      res.status(200).json({  
-        status: "success",
-        message: "Login successful",
-        result: result
-      });
+
+    // send success response with user data and token in REST format
+    res.status(200).json({
+      status: "success",
+      message: "Login successful",
+      result: result
+    });
 
   }
   catch (error) {
 
-  
+
     // handle specific errors and send appropriate responses
 
     // user not found error , status code is 401 (Unauthorized)
-     if(error.message==="USER_NOT_FOUND "){
+    if (error.message === "USER_NOT_FOUND") {
       return res.status(401).json({
         status: "error",
         message: "User not found",
         error: error.message
       });
     }
-      
-    
+
+
     // invalid credentials error , status code is 401 (Unauthorized)
     if (error.message === "VALIDATION_ERROR") {
       return res.status(422).json({
@@ -100,8 +99,8 @@ export const loginUser = async (req, res) => {
         error: error.message
       });
     }
-      
-    
+
+
     //  fallback (unknown error)
     return res.status(500).json({
       status: "error",
