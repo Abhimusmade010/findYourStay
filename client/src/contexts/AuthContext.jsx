@@ -36,30 +36,69 @@ export const AuthProvider = ({ children }) => {
       setError(null)
 
       const response = await authAPI.login({ email, password })
-      const { token, user: userData } = response.data
+      console.log("Response from login API:", response.data);
       
+      // const { token, user: userData } = response.data
+
+      const {status,message,result} = response.data
+       if (status !== "success") {
+        setError(message)
+        return { success: false, error: message }
+      }
+      console.log("Response from login API:", response.data);
+
+
+      console.log("Extracted result:", result)
+      const { token, user: userData } = result;
+
+      console.log("Extracted token:", token)
+      console.log("user id",userData)
+
+
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(userData))
       setUser(userData)
-      return { success: true, user: userData }
-    } catch (err) {
+
+      return { 
+        success: true, 
+        user: userData 
+      }
+
+    } 
+    
+    catch (err) {
       const errorMessage = err.response?.data?.message || 'Login failed'
       setError(errorMessage)
-      return { success: false, error: errorMessage }
+      return { 
+        success: false, 
+        error: errorMessage 
+      }
     }
   }
 
   const register = async (userData) => {
     try {
       setError(null)
+
       const response = await authAPI.register(userData)
-      const { token, user: newUser } = response.data
+      
+      const {status,message,result} = response.data
+
+      if (status !== "success") {
+        setError(message)
+        return { success: false, error: message }
+      }
+
+      const { token, user: newUser } = result;
       
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(newUser))
       setUser(newUser)
+
       return { success: true, user: newUser }
-    } catch (err) {
+
+    } 
+    catch (err) {
       // const errorMessage = err.response?.data?.message || 'Registration failed'
       // setError(errorMessage)
       // return { success: false, error: errorMessage }

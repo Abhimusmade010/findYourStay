@@ -15,7 +15,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const { success, error: showError } = useToast()
   // const { error: showError } = useToast();
-  
+  // const { user } = useAuth()
+
+  // console.log("USER AFTER LOGIN:", user)
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -25,10 +27,10 @@ export default function LoginPage() {
     // showError(error || "Login failed. Please try again."  );
 
     if (res.success) {
-      success("Logged in successfully!")
-
+    
       if (res.user?.role === 'Admin') navigate('/admin')
       else navigate('/')
+      success("Logged in successfully!")
     }
     else{
       showError(res.error || "Login failed. Please try again.");
