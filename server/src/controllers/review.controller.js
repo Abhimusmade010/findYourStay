@@ -17,6 +17,7 @@ export const addReviewController = async (req, res) => {
 
     return res.status(201).json({
       status: "success",
+
       message: "Review added successfully",
       result
      });

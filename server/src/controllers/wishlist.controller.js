@@ -25,7 +25,7 @@ export const addToWishlistcontroller=async(req,res)=>{
     catch(error){
         res.status(400).json({
             status:"error",
-            error:error.message
+            message:error.message
         })
     }
 }
@@ -38,9 +38,7 @@ export const getwishlistcontroller=async(req,res)=>{
 
         const result=await getwishlistservice(userId);
 
-        console.log("result in getwishcontroller is",result);
 
-        // console.log("wishlist is in controller is",result.wishlist);
         res.status(200).json({
             status:"success",   
             message:"Wishlist fetch successfully",
@@ -49,7 +47,7 @@ export const getwishlistcontroller=async(req,res)=>{
     }catch(error){
         res.status(400).json({
             status:"error",
-            error:error.message
+            message:error.message
         })
 
     }
@@ -74,7 +72,8 @@ export const deletewishlistcontroller=async(req,res)=>{
     catch(error){
         res.status(400).json({
             status:"error",
-            error:error.message
+            message:error.message
         })
     }
 }
+

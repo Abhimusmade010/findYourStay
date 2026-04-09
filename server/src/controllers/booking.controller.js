@@ -1,13 +1,7 @@
 
-import { approveBookingService } from "../services/booking.service.js"
-import { createBookingService } from "../services/booking.service.js";
-import { getmyHotelsPendingBookingService } from "../services/booking.service.js";
-// import { getConfirmedBookingService } from "../services/booking.service.js";
-import { getConfirmedBookingService } from "../services/booking.service.js";
-import { getActiveBookingsForCustomerService } from "../services/booking.service.js";
-import { getBookingHistoryForCustomerService } from "../services/booking.service.js";
-import { denyBookingService } from "../services/booking.service.js";
-import { cancelBookingService } from "../services/booking.service.js";
+
+import { approveBookingService, createBookingService, getmyHotelsPendingBookingService, getConfirmedBookingService, getActiveBookingsForCustomerService, getBookingHistoryForCustomerService, denyBookingService, cancelBookingService } from "../services/booking.service.js";
+
 
 export const cancelBookingController = async (req, res) => {
 
@@ -17,12 +11,14 @@ export const cancelBookingController = async (req, res) => {
 
     const result = await cancelBookingService(customerId, bookingId);
     return res.status(200).json({
-      result,
+      status: "success",
       message: "Booking cancelled successfully",
+      result
     });
   } catch (error) {
     return res.status(400).json({
-      success: false,
+     
+      status: "error",
       message: error.message,
     });
   }
@@ -40,13 +36,15 @@ export const createBookingcontroller=async (req,res)=>{
         const booking=await createBookingService({hotelId,checkIn,checkOut,customerId});
 
         res.status(200).json({
+            status: "success",
             result:booking,
             message:"Booking created successfully.Awaiting admin approval!!",
         })
         
     }catch(error){
         res.status(400).json({
-            success:false,
+          
+            status: "error",
             error: error.message
         })
     }
@@ -58,18 +56,17 @@ export const getMyConfirmedBookingsController=async(req,res)=>{
         // const {bookingId}=req.body;
 
         const userId=req.user._id;
-        // console.log("in getConfirmedBookingController booking id",bookingId)
-        console.log("in getConfirmedBookingController user ID",userId)
-        // const result=await approveBookingService(userId.bookingId);
         const result=await getConfirmedBookingService(userId);
 
         res.status(200).json({
-            result,
-            message:"successfully added confirmed booking by the admin!!"
+            status: "success",
+            message:"successfully added confirmed booking by the admin!!",
+            result
         })
     }catch(error){
         res.status(400).json({
-            success:false,
+            // success:false,
+            status: "error",
             error:error.message
         })
     }
@@ -78,19 +75,19 @@ export const getMyConfirmedBookingsController=async(req,res)=>{
 export const approveBookingController=async(req,res)=>{
 
     try{
-        // console.log("entry in approveBookingController")
         const {bookingId}=req.body;
         const userId=req.user._id;
-        // controller for the approve booking by the admin for the customer 
-        console.log("data from the req.,body is ",bookingId);
+
         const result =await approveBookingService(userId,bookingId);
         res.status(200).json({
-            result,
-            message:"successfully confirmed booking by the admin for you!!"
+            status: "success",
+            message:"successfully confirmed booking by the admin for you!!",
+            result
         })
-    }catch(error){
+    }
+    catch(error){
         res.status(400).json({
-            success:false,
+            status: "error",
             error:error.message
         })
     }
@@ -107,14 +104,14 @@ export const getmyHotelsPendingBookingController=async(req,res)=>{
         console.log("result in contoller is",result);
         
         res.status(200).json({
+            status: "success",
             message:"Boookings fetch successfully!!",
             result
-
         })
     }catch(error){
 
         res.status(400).json({
-            success:false,
+            status: "error",
             error:error.message
         })
 
@@ -138,10 +135,16 @@ export const getActiveBookingsForCustomerController = async (req, res) => {
   try {
     const customerId = req.user._id;
     const result = await getActiveBookingsForCustomerService(customerId);
-    return res.status(200).json(result);
+    return res.status(200).json(
+      {
+        status: "success",
+        message: "Active bookings fetched successfully",
+        result
+      }
+    );
   } catch (error) {
     return res.status(400).json({
-      success: false,
+      status: "error",
       message: error.message,
     });
   }
@@ -151,10 +154,14 @@ export const getBookingHistoryForCustomerController = async (req, res) => {
   try {
     const customerId = req.user._id;
     const result = await getBookingHistoryForCustomerService(customerId);
-    return res.status(200).json(result);
+    return res.status(200).json({
+      status: "success",
+      message: "Booking history fetched successfully",
+      result
+    });
   } catch (error) {
     return res.status(400).json({
-      success: false,
+      status: "error",
       message: error.message,
     });
   }
@@ -168,12 +175,13 @@ export const denyBookingController = async (req, res) => {
 
     const result = await denyBookingService(adminUserId, bookingId);
     return res.status(200).json({
-      result,
+      status: "success",
       message: "Booking denied",
+      result
     });
   } catch (error) {
     return res.status(400).json({
-      success: false,
+      status: "error",
       message: error.message,
     });
   }
