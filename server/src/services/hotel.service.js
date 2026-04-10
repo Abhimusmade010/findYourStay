@@ -22,7 +22,7 @@ export const searchForHotel=async(data)=>{
     });
 
     if(!myhotels.length) {    
-        throw new Error({ message: "No hotels found for the given location" });
+        throw new Error( "No hotels found for the given location" );
     }
     return{
         myhotels

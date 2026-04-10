@@ -139,7 +139,7 @@ export const getActiveBookingsForCustomerController = async (req, res) => {
       {
         status: "success",
         message: "Active bookings fetched successfully",
-        result
+        result:result
       }
     );
   } catch (error) {
