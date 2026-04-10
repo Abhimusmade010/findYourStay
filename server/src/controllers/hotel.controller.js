@@ -115,8 +115,6 @@ export const getoneHotel=async (req,res)=>{
   }
 }
 
-
-
 export const createHotel = async (req, res) => {
   try {
     // const data = req.body;
