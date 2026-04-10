@@ -13,51 +13,104 @@ export default function BookingsPage() {
   const isAdmin = user?.role === 'Admin'
   const [activeTab, setActiveTab] = useState('mine')
 
-  const { data: active = [] } = useQuery({
-    queryKey: ['bookings', 'active'],
-    queryFn: async () => (await bookingsAPI.getActive()).data,
-    refetchInterval: 15000,
-  })
+  // const { data: active = [] } = useQuery({
+  //   queryKey: ['bookings', 'active'],
+  //   queryFn: async () => (await bookingsAPI.getActive()).data,
+  //   // console.log("")
 
-  const { data: history = [] } = useQuery({
-    queryKey: ['bookings', 'history'],
-    queryFn: async () => (await bookingsAPI.getHistory()).data,
+  //   refetchInterval: 15000,
+  // })
+
+  const { data: active = [] } = useQuery({
+  queryKey: ['bookings', 'active'],
+    queryFn: async () => {
+      const res = await bookingsAPI.getActive();
+      return Array.isArray(res.data?.result) ? res.data.result : [];
+    },
     refetchInterval: 15000,
-  })
+  });
+
+  // const { data: history = [] } = useQuery({
+  //   queryKey: ['bookings', 'history'],
+  //   queryFn: async () => (await bookingsAPI.getHistory()).data,
+  //   refetchInterval: 15000,
+  // })
+  const { data: history = [] } = useQuery({
+  queryKey: ['bookings', 'history'],
+    queryFn: async () => {
+      const res = await bookingsAPI.getHistory();
+      return Array.isArray(res.data?.result) ? res.data.result : [];
+    },
+    refetchInterval: 15000,
+  });
 
   // NOTE: enabled is passed as an option to useQuery (not destructured)
+  // const { data: pending = [] } = useQuery({
+  //   queryKey: ['bookings', 'pending'],
+  //   // queryFn: async () => (await bookingsAPI.getPending()).data,
+  //   queryFn:async()=>{
+  //     const result=await bookingsAPI.getPending();
+  //     console.log("In pending of frontend result of getPOending axios api is",result.data.result)
+  //     return result.data.result
+  //   },
+
+  //   enabled: isAdmin
+
+  // })
+
   const { data: pending = [] } = useQuery({
-    queryKey: ['bookings', 'pending'],
-    // queryFn: async () => (await bookingsAPI.getPending()).data,
-    queryFn:async()=>{
-      const result=await bookingsAPI.getPending();
-      console.log("In pending of frontend result of getPOending axios api is",result.data.result)
-      return result.data.result
+  queryKey: ['bookings', 'pending'],
+    queryFn: async () => {
+      const res = await bookingsAPI.getPending(); 
+      console.log("In pending of frontend result of getPending axios api is", res.data.result);
+      return Array.isArray(res.data?.result) ? res.data.result : [];
     },
-
     enabled: isAdmin
+  });
 
-  })
-  // console.log("response after get pending",response.result)
+
+  // const { data: owned = [] } = useQuery({
+  //   queryKey: ['bookings', 'owned'],
+  //   // queryFn: async () => (await bookingsAPI.getOwned()).data,
+  //   queryFn:async()=>{
+  //     const result=await bookingsAPI.getOwned();
+  //     console.log("In pending of frontend result of getOwned axios api is",result.data.result)
+  //     return result.data.result
+  //   },
+  //   enabled: isAdmin
+  // })
+
   const { data: owned = [] } = useQuery({
-    queryKey: ['bookings', 'owned'],
-    // queryFn: async () => (await bookingsAPI.getOwned()).data,
-    queryFn:async()=>{
-      const result=await bookingsAPI.getOwned();
-      console.log("In pending of frontend result of getOwned axios api is",result.data.result)
-      return result.data.result
+  queryKey: ['bookings', 'owned'],
+    queryFn: async () => {
+      const res = await bookingsAPI.getOwned();
+      console.log("In pending of frontend result of getOwned axios api is", res.data.result);
+      return Array.isArray(res.data?.result) ? res.data.result : [];
     },
     enabled: isAdmin
-  })
+  });
+
 
   console.log("before approveMutation")
 
 
+  // const approveMutation = useMutation({
+  //   mutationFn:async(id)=>{
+  //     const result=await bookingsAPI.approve(id);
+  //     console.log("data is ",result)
+  //     return result.data;
+  //   },
+  //   onSuccess: () => {
+  //     qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
+  //     showSuccess('Booking approved')
+  //   },
+  //   onError: (e) => showError(e?.response?.data?.message || 'Failed to approve')
+  // })
   const approveMutation = useMutation({
-    mutationFn:async(id)=>{
-      const result=await bookingsAPI.approve(id);
-      console.log("data is ",result)
-      return result.data;
+    mutationFn: async (id) => {
+      const res = await bookingsAPI.approve(id);
+      console.log("data from approve api is ", res);
+      return res.data;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
@@ -69,8 +122,20 @@ export default function BookingsPage() {
 
   console.log("below approve mutaton logxi in react file")
   // console.log("result from mutation approve is",mutationFn)
+  // const denyMutation = useMutation({
+  //   mutationFn: async (id) => (await bookingsAPI.deny(id)).data,
+  //   onSuccess: () => {
+  //     qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
+  //     showSuccess('Booking denied')
+  //   },
+  //   onError: (e) => showError(e?.response?.data?.message || 'Failed to deny')
+  // })
   const denyMutation = useMutation({
-    mutationFn: async (id) => (await bookingsAPI.deny(id)).data,
+    mutationFn: async (id) => {
+      const res = await bookingsAPI.deny(id);
+      console.log("data from deny api is ", res);
+      return res.data;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
       showSuccess('Booking denied')

@@ -43,9 +43,9 @@ export const authAPI = {
 }
 
 // Hotels API
+
 export const hotelsAPI = {
   getAll: () => api.get('/hotels/gethotels'),
-  
   getById: (id) => api.get(`/hotels/gethotelDetails/${id}`),
   search: (searchParams) => api.post('/hotels/search',searchParams),
   
