@@ -95,8 +95,28 @@ const logUser = async (data) => {
   };
 };
 
-export { registerUser, logUser, createAdmin };
+// ─── SuperAdmin: get all Admin accounts ───
+const getAllAdmins = async () => {
+  const admins = await User.find({ role: "Admin" })
+    .select("-passwordHash")
+    .sort({ createdAt: -1 });
+  return admins;
+};
 
+// ─── SuperAdmin: delete an Admin account ───
+const deleteAdmin = async (adminId) => {
+  const admin = await User.findById(adminId);
+  if (!admin) {
+    throw new Error("ADMIN_NOT_FOUND");
+  }
+  if (admin.role !== "Admin") {
+    throw new Error("NOT_AN_ADMIN");
+  }
+  await User.findByIdAndDelete(adminId);
+  return { id: adminId, name: admin.name, email: admin.email };
+};
+
+export { registerUser, logUser, createAdmin, getAllAdmins, deleteAdmin };
 
 //so what i did, one SuperAdmin is seeded in the database when the project is set up for the first time.
 // Only the SuperAdmin can create Admin accounts via the protected /create-admin route.

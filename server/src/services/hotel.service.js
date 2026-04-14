@@ -111,3 +111,21 @@ export const adminHotels = async (userId) => {
 };
 
 
+// ─── SuperAdmin: get ALL hotels with admin info ───
+export const fetchAllHotelsWithAdmin = async () => {
+  const hotels = await Hotel.find()
+    .populate("createdBy", "name email role")
+    .sort({ createdAt: -1 });
+  return hotels;
+};
+
+
+// ─── SuperAdmin: delete any hotel by ID ───
+export const removeHotel = async (hotelId) => {
+  const hotel = await Hotel.findById(hotelId);
+  if (!hotel) {
+    throw new Error("Hotel not found");
+  }
+  await Hotel.findByIdAndDelete(hotelId);
+  return { id: hotelId, name: hotel.name };
+};
