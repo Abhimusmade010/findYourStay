@@ -4,40 +4,41 @@ import { hotelsAPI } from '../lib/api'
 import { Input } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
-import { useState, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function HotelsPage() {
-  const [params, setParams] = useSearchParams()
-  const navigate = useNavigate()
-  const [minPrice, setMinPrice] = useState('')
-  const [maxPrice, setMaxPrice] = useState('')
-  const [city, setCity] = useState(params.get('city') || '')
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  // Controlled filter states
+  const [city, setCity] = useState(searchParams.get('city') || '');
+  const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
+  const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
 
+  // Update URL when filters change
+  useEffect(() => {
+    const params = {};
+    if (city) params.city = city;
+    if (minPrice) params.minPrice = minPrice;
+    if (maxPrice) params.maxPrice = maxPrice;
+    setSearchParams(params);
+  }, [city, minPrice, maxPrice, setSearchParams]);
+
+  // Build params for API
+  const apiParams = {};
+  if (city) apiParams.city = city;
+  if (minPrice) apiParams.minPrice = minPrice;
+  if (maxPrice) apiParams.maxPrice = maxPrice;
+
+  // Fetch hotels from backend with filters
   const { data: hotels = [], isLoading } = useQuery({
-    queryKey: ['hotels'],
-    queryFn: async () =>{
-      const res=await hotelsAPI.getAll()
-      console.log("inside query fucntion",res);
-      return res.data.result.hotels
+    queryKey: ['hotels', apiParams],
+    queryFn: async () => {
+      const res = await hotelsAPI.search(apiParams);
+      // Support both { hotels } and { result: { hotels } }
+      return res.data.myhotels.hotels || res.data.result?.hotels || [];
     }
-    // staleTime: 1000 * 60 * 5,   // ✅ 5 minutes
-    // refetchOnWindowFocus: false // optional
-  }) 
-  
-  console.log("Query fuction",hotels)
-  //till here from backend hotels are fetched and from her onwards filter is applied on fetch data
+  });
 
-  const filtered = useMemo(() =>{
-    return hotels.filter(h => {
-      const priceOk = (!minPrice || h.pricePerNight >= Number(minPrice)) && (!maxPrice || h.pricePerNight <= Number(maxPrice))
-      const cityOk = !city || (h.location?.city || '').toLowerCase().includes(city.toLowerCase())
-      return priceOk && cityOk
-    })
-  }, [hotels, minPrice, maxPrice, city])
-  console.log("data of hotels",hotels);
-  console.log("before return function")
-  console.log("After aplying filter",filtered);
-  
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -45,13 +46,12 @@ export default function HotelsPage() {
         <div className="glass-effect rounded-xl p-4 h-fit">
           <h3 className="text-lg font-semibold mb-4">Filters</h3>
           <div className="space-y-3">
-            <Input placeholder="City" value={city} onChange={(e) => setCity(e.target.value)} />
+            <Input placeholder="City" value={city} onChange={e => setCity(e.target.value)} />
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Min Price" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
-              <Input placeholder="Max Price" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+              <Input placeholder="Min Price" value={minPrice} onChange={e => setMinPrice(e.target.value)} />
+              <Input placeholder="Max Price" value={maxPrice} onChange={e => setMaxPrice(e.target.value)} />
             </div>
-            {/* <Button variant="gradient" onClick={() => setParams({city})}>Apply</Button> */}
-            {/* <Button variant="gradient" onClick={() => setParams({ city,maxPrice,minPrice })}>Apply</Button> */}
+            {/* You can add more filters here (amenities, availability, etc.) */}
           </div>
         </div>
 
@@ -61,7 +61,7 @@ export default function HotelsPage() {
             <p className="text-muted-foreground">Loading hotels...</p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.map(h => (
+              {hotels.map(h => (
                 <Card key={h._id} className="overflow-hidden">
                   <div className="relative h-40 bg-gradient-to-br from-blue-500/30 to-purple-600/30">
                     {(() => {
@@ -96,5 +96,5 @@ export default function HotelsPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

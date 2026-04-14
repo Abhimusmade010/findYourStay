@@ -12,6 +12,7 @@ export const fetchHotels=async()=>{
 
 }
 
+
 export const searchForHotel=async(filters)=>{
     const query={};
     // q is the search term that the user will enter in the search bar, it can be the name of the hotel, city, state or description of the hotel
@@ -50,14 +51,12 @@ export const searchForHotel=async(filters)=>{
     }
 
     //amenities for search  
-    //filters.amenities is an array of amenities that the user will select from the search filters, 
-    // we will search for the hotels that have all the amenities selected by the user
+    //filters.amenities is an array of amenities that the user will select from the search filters, we will search for the hotels that have all the amenities selected by the user
     if(filters.amenities?.length){
         query.amenities={$all:filters.amenities};
     }
 
-    //$all operator is used to match all the elements of the array, 
-    // in this case we want to match all the amenities selected by the user with the amenities of the hotel
+    //$all operator is used to match all the elements of the array, in this case we want to match all the amenities selected by the user with the amenities of the hotel
 
 
     //availability
@@ -66,8 +65,7 @@ export const searchForHotel=async(filters)=>{
     }
 
     //sorting
-    //sortoptions is an object that contains the sorting options for the search results, we will sort the search results 
-    // based on the sorting option selected by the user
+    //sortoptions is an object that contains the sorting options for the search results, we will sort the search results based on the sorting option selected by the user
     //price_asc
     const sortOptions={
         price_asc:{pricePerNight:1},
