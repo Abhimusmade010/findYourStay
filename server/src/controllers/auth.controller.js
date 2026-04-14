@@ -1,4 +1,4 @@
-import { registerUser, logUser } from "../services/auth.service.js";
+import { registerUser, logUser, createAdmin } from "../services/auth.service.js";
 
 // controller for handling user registration and login
 export const signUpUser = async (req, res) => {
@@ -6,8 +6,7 @@ export const signUpUser = async (req, res) => {
     // extract user data from request body
     const data = req.body;
     const result = await registerUser(data);
-
-
+    
     // send success response with user data and token in REST format
     res.status(201).json({
       status: "success",
@@ -102,6 +101,57 @@ export const loginUser = async (req, res) => {
 
 
     //  fallback (unknown error)
+    return res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message
+    });
+
+  }
+};
+
+
+// ─── Admin-only: create a new Admin account ───
+// This route is protected by authMiddleware + requireRole("Admin") in routes.
+// Only an already-authenticated Admin can create other Admins.
+export const createAdminController = async (req, res) => {
+  try {
+    const data = req.body;
+    const result = await createAdmin(data);
+
+    res.status(201).json({
+      status: "success",
+      message: "Admin account created successfully",
+      result: result
+    });
+
+  }
+  catch (error) {
+
+    if (error.message === "EMAIL_EXISTS") {
+      return res.status(409).json({
+        status: "error",
+        message: "Email already exists",
+        error: error.message
+      });
+    }
+
+    if (error.message === "VALIDATION_ERROR") {
+      return res.status(422).json({
+        status: "error",
+        message: "Invalid input data",
+        error: error.message
+      });
+    }
+
+    if (error.message === "WEAK_PASSWORD") {
+      return res.status(422).json({
+        status: "error",
+        message: "Password is too weak",
+        error: error.message
+      });
+    }
+
     return res.status(500).json({
       status: "error",
       message: "Internal server error",

@@ -63,14 +63,6 @@ export const authMiddleware = async (req, res, next) => {
   }
 };
 
-/**
- * Helper: Invalidate cached user data
- *
- * Call this whenever user data changes (profile update, role change, etc.)
- * so the next request fetches fresh data from MongoDB.
- *
- * Usage: await invalidateUserCache(userId)
- */
 export const invalidateUserCache = async (userId) => {
   await redisClient.del(`user:${userId}`);
 };
