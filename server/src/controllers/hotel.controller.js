@@ -1,5 +1,5 @@
 // import hotelModel from "../models/hotel.model.js";
-import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel,adminHotels} from "../services/hotel.service.js"
+import { fetchHotels,searchForHotel,fetchHotel,addHotel,modifyHotel,adminHotels,fetchAllHotelsWithAdmin,removeHotel} from "../services/hotel.service.js"
 import { redisClient } from "../config/redis.js";
 import { uploadToCloudinary } from "../utils/uploadService.js";
 
@@ -265,7 +265,6 @@ export const getMyHotels=async(req,res)=>{
   
     
     res.status(200).json({
-      // success:true,
       status: "success",
       message:"Hotel fetched for admin",
       result
@@ -276,14 +275,12 @@ export const getMyHotels=async(req,res)=>{
 
     if(error.message === "UserID is required"){
       return res.status(400).json({
-        // success: false,
         status: "error",
         message: error.message
       });
     }
 
     res.status(400).json({
-      // success: false,
       status: "error",
       message: error.message
     });
@@ -291,3 +288,39 @@ export const getMyHotels=async(req,res)=>{
   }
 
 }
+
+
+// ─── SuperAdmin-only: get ALL hotels with admin creator info ───
+export const getAllHotelsForSuperAdmin = async (req, res) => {
+  try {
+    const result = await fetchAllHotelsWithAdmin();
+    res.status(200).json({
+      status: "success",
+      message: "All hotels fetched for SuperAdmin",
+      result
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+
+// ─── SuperAdmin-only: delete any hotel by ID ───
+export const deleteHotelController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await removeHotel(id);
+    await redisClient.del("all_hotels"); // invalidate cache
+    res.status(200).json({
+      status: "success",
+      message: `Hotel "${result.name}" deleted successfully`,
+      result
+    });
+  } catch (error) {
+    if (error.message === "Hotel not found") {
+      return res.status(404).json({ status: "error", message: error.message });
+    }
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
