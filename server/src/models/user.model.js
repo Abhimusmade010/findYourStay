@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
         required: true },
     role:{ 
         type: String, 
-        enum: ["Admin", "Customer"], 
+        enum: ["SuperAdmin", "Admin", "Customer"], 
         default: "Customer" },
 
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: "Hotel" }], 

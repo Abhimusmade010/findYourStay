@@ -6,20 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Button } from '../components/ui/Button'
 import { useToast } from '../components/ui/Toast'
 
-export default function BookingsPage() {
+
+export default function BookingsPage(){
+
   const { user } = useAuth()
   const { error: showError, success: showSuccess } = useToast()
   const qc = useQueryClient()
   const isAdmin = user?.role === 'Admin'
   const [activeTab, setActiveTab] = useState('mine')
 
-  // const { data: active = [] } = useQuery({
-  //   queryKey: ['bookings', 'active'],
-  //   queryFn: async () => (await bookingsAPI.getActive()).data,
-  //   // console.log("")
-
-  //   refetchInterval: 15000,
-  // })
 
   const { data: active = [] } = useQuery({
   queryKey: ['bookings', 'active'],
@@ -30,11 +25,7 @@ export default function BookingsPage() {
     refetchInterval: 15000,
   });
 
-  // const { data: history = [] } = useQuery({
-  //   queryKey: ['bookings', 'history'],
-  //   queryFn: async () => (await bookingsAPI.getHistory()).data,
-  //   refetchInterval: 15000,
-  // })
+
   const { data: history = [] } = useQuery({
   queryKey: ['bookings', 'history'],
     queryFn: async () => {
@@ -44,19 +35,6 @@ export default function BookingsPage() {
     refetchInterval: 15000,
   });
 
-  // NOTE: enabled is passed as an option to useQuery (not destructured)
-  // const { data: pending = [] } = useQuery({
-  //   queryKey: ['bookings', 'pending'],
-  //   // queryFn: async () => (await bookingsAPI.getPending()).data,
-  //   queryFn:async()=>{
-  //     const result=await bookingsAPI.getPending();
-  //     console.log("In pending of frontend result of getPOending axios api is",result.data.result)
-  //     return result.data.result
-  //   },
-
-  //   enabled: isAdmin
-
-  // })
 
   const { data: pending = [] } = useQuery({
   queryKey: ['bookings', 'pending'],
@@ -69,17 +47,6 @@ export default function BookingsPage() {
   });
 
 
-  // const { data: owned = [] } = useQuery({
-  //   queryKey: ['bookings', 'owned'],
-  //   // queryFn: async () => (await bookingsAPI.getOwned()).data,
-  //   queryFn:async()=>{
-  //     const result=await bookingsAPI.getOwned();
-  //     console.log("In pending of frontend result of getOwned axios api is",result.data.result)
-  //     return result.data.result
-  //   },
-  //   enabled: isAdmin
-  // })
-
   const { data: owned = [] } = useQuery({
   queryKey: ['bookings', 'owned'],
     queryFn: async () => {
@@ -91,21 +58,6 @@ export default function BookingsPage() {
   });
 
 
-  console.log("before approveMutation")
-
-
-  // const approveMutation = useMutation({
-  //   mutationFn:async(id)=>{
-  //     const result=await bookingsAPI.approve(id);
-  //     console.log("data is ",result)
-  //     return result.data;
-  //   },
-  //   onSuccess: () => {
-  //     qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
-  //     showSuccess('Booking approved')
-  //   },
-  //   onError: (e) => showError(e?.response?.data?.message || 'Failed to approve')
-  // })
   const approveMutation = useMutation({
     mutationFn: async (id) => {
       const res = await bookingsAPI.approve(id);
@@ -119,17 +71,7 @@ export default function BookingsPage() {
     onError: (e) => showError(e?.response?.data?.message || 'Failed to approve')
   })
 
-
-  console.log("below approve mutaton logxi in react file")
-  // console.log("result from mutation approve is",mutationFn)
-  // const denyMutation = useMutation({
-  //   mutationFn: async (id) => (await bookingsAPI.deny(id)).data,
-  //   onSuccess: () => {
-  //     qc.invalidateQueries({ queryKey: ['bookings', 'pending'] })
-  //     showSuccess('Booking denied')
-  //   },
-  //   onError: (e) => showError(e?.response?.data?.message || 'Failed to deny')
-  // })
+  
   const denyMutation = useMutation({
     mutationFn: async (id) => {
       const res = await bookingsAPI.deny(id);
@@ -150,6 +92,7 @@ export default function BookingsPage() {
     </Button>
   )
 
+  //UI 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 space-y-6">
       <div className="flex items-center gap-2">
@@ -246,4 +189,8 @@ export default function BookingsPage() {
       )}
     </div>
   )
+
+  
 }
+
+

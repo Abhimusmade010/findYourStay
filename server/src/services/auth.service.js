@@ -1,64 +1,69 @@
-import dotenv from "dotenv";
-dotenv.config();
+
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
-//service function for handling user registration
-const registerUser = async (data) => {
-  //data came from the controller which is from the request body
-  const { name, email, password, role } = data;
+//Helper: shared logic for creating a user
+const buildUser = async ({ name, email, password, role }) => {
 
   if (!name || !email || !password) {
     throw new Error("VALIDATION_ERROR");
   }
 
-  //check if user with the same email already exists
+  // check if user with the same email already exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     throw new Error("EMAIL_EXISTS");
   }
 
-  // check for weak password (example: password should be at least 6 characters),we already have validation using middleware using zod but this is an additional check for password strength
+  // additional check for password strength (Zod middleware also validates, this is defense-in-depth)
   if (password.length < 6) {
     throw new Error("WEAK_PASSWORD");
   }
 
-  //hash the password before saving to database 
-  // with salting rounds of 10 ,saliting is for security to make it more difficult for attackers to crack the password hash 
-  // because it adds random data to the input of the hash function, so even if two users have the same password, their hashes will be different due to different salts
+  // hash the password before saving to database
+  // salting rounds of 10 adds random data so identical passwords produce different hashes
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // create new user in the database with the hashed password and default role as "Customer" if role is not provided
   const user = await User.create({
     name,
     email,
     passwordHash,
-    role: role || "Customer"
+    role,
   });
 
-  //token
   const token = jwt.sign(
     { userId: user._id, role: user.role },
     process.env.JWT_SECRET,
     { expiresIn: "24h" }
   );
 
-  return { 
-    name,
-    email,
-    role,
-    token 
+  return {
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    token,
+  };
 };
+
+//Public registration: role is always set to "Customer" server-side, client cannot specify it
+const registerUser = async (data) => {
+  const { name, email, password } = data;
+  return buildUser({ name, email, password, role: "Customer" });
+};
+
+
+//Admin creation: role is always set to "Admin" server-side, client cannot specify it
+const createAdmin = async (data) => {
+  const { name, email, password } = data;
+  return buildUser({ name, email, password, role: "Admin" });
 };
 
 const logUser = async (data) => {
-
-
   const { email, password } = data;
 
-
   const user = await User.findOne({ email });
+
   if (!user) {
     throw new Error("USER_NOT_FOUND");
   }
@@ -77,8 +82,7 @@ const logUser = async (data) => {
 
   // console.log("Generated token:", token);
   // console.log("Dot count at login:", token.split(".").length - 1);
-
-
+  
   return {
     message: "Login successful",
     token,
@@ -91,4 +95,10 @@ const logUser = async (data) => {
   };
 };
 
-export { registerUser, logUser };
+export { registerUser, logUser, createAdmin };
+
+
+//so what i did, one SuperAdmin is seeded in the database when the project is set up for the first time.
+// Only the SuperAdmin can create Admin accounts via the protected /create-admin route.
+// Admins manage hotels and bookings. The registerUser service is public and always creates a Customer account,
+// regardless of any role field sent by the client (which is ignored).

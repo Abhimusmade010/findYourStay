@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
-dotenv.config();
+// import dotenv from "dotenv";
+// dotenv.config();
 
 import Hotel from "../models/hotel.model.js"
 
@@ -37,7 +37,8 @@ export const fetchHotel=async(data)=>{
     // console.log("Hotel from getoneHotel is",hotel);
 
     if(!hotel){
-        throw new Error({message:"No Hotel Found"})
+        
+        throw new Error("No Hotel Found");
     }
     return{
         hotel   
@@ -74,17 +75,13 @@ export const modifyHotel=async(id,data,userId)=>{
 
 
     const existingHotel = await Hotel.findById(id);
-
     if (!existingHotel) {
         throw new Error("Hotel not found");
     }
-
-
     if (existingHotel.createdBy.toString() !== userId.toString()) {
         throw new Error("You are not authorized to update this hotel");
     }
     
-
     const updated=await Hotel.findByIdAndUpdate(
         id,
         data,

@@ -1,22 +1,27 @@
-export const requireRole = (role) => {
+// Role hierarchy: SuperAdmin > Admin > Customer
+// SuperAdmin inherits all Admin permissions automatically.
+const ROLE_HIERARCHY = {
+  SuperAdmin: 3,
+  Admin: 2,
+  Customer: 1,
+};
+
+export const requireRole = (minimumRole) => {
 
   return (req, res, next) => {
 
-    // console.log("in requireROle")
-    // console.log("in the require role")
     if (!req.user) return res.status(401).json({ message: "Unauthorized" });
-    // console.log("role from requiest is ",role)
-    // console.log("role from the user is ",req.user.role)
-    if(req.user.role !== role) {
+
+    const userLevel = ROLE_HIERARCHY[req.user.role] || 0;
+    const requiredLevel = ROLE_HIERARCHY[minimumRole] || 0;
+
+    if (userLevel < requiredLevel) {
           return res.status(403).json({  
-            message: `Only ${role}s can access this route` 
+            message: `Only ${minimumRole}s can access this route` 
           });
     }
     
-    // console.log("leavving the requireRole")
     next();
 
   };
 };
-
-
