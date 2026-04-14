@@ -13,13 +13,24 @@ import NotFound from './pages/NotFound'
 import WishlistPage from './pages/WishlistPage'
 import BookingsPage from './pages/BookingsPage'
 import AdminDashboard from './pages/AdminDashboard'
+import SuperAdminDashboard from './pages/SuperAdminDashboard'
 import NotificationsPage from './pages/NotificationsPage'
+
+// Role hierarchy: SuperAdmin (3) > Admin (2) > Customer (1)
+const ROLE_LEVELS = { SuperAdmin: 3, Admin: 2, Customer: 1 }
 
 function ProtectedRoute({ children, role }) {
   const { isAuthenticated, loading, user } = useAuth()
   if (loading) return null
   if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (role && user?.role !== role) return <Navigate to="/" replace />
+
+  // If a minimum role is required, check hierarchy
+  if (role) {
+    const userLevel = ROLE_LEVELS[user?.role] || 0
+    const requiredLevel = ROLE_LEVELS[role] || 0
+    if (userLevel < requiredLevel) return <Navigate to="/" replace />
+  }
+
   return children
 }
 
@@ -42,6 +53,7 @@ export default function App() {
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/wishlist" element={<ProtectedRoute><WishlistPage /></ProtectedRoute>} />
           <Route path="/admin" element={<ProtectedRoute role="Admin"><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/super-admin" element={<ProtectedRoute role="SuperAdmin"><SuperAdminDashboard /></ProtectedRoute>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="*" element={<NotFound />} />
@@ -51,3 +63,4 @@ export default function App() {
     </div>
   )
 }
+

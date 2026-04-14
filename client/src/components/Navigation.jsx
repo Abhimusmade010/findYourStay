@@ -156,7 +156,8 @@ const Navigation = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => {
-                    if (user?.role === 'Admin') navigate('/admin')
+                    if (user?.role === 'SuperAdmin') navigate('/super-admin')
+                    else if (user?.role === 'Admin') navigate('/admin')
                   }}
                 >
                   <div className="w-4 h-4 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">

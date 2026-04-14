@@ -10,11 +10,9 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/Card";
-// import { data } from "react-router";
 
 
 export default function AdminDashboard() {
- console.log("inside the admin dashboard")
   const qc = useQueryClient();
   const { error: showError } = useToast();
   const initialFormState={
@@ -44,36 +42,13 @@ export default function AdminDashboard() {
     queryKey: ['hotels'],
     queryFn: async () => {
       const res=await hotelsAPI.getMine()
-      console.log("inside query fucntion",res);
       return res.data.result
     },
     throwOnError: true,
-    // (await hotelsAPI.getMine()).data,
-    
   });
 
 
   const createMutation = useMutation({
-    // mutationFn: async () => {
-    //   const payload = {
-    //     name: form.name,
-    //     description: form.description,
-    //     pricePerNight: Number(form.pricePerNight),
-    //     location: {
-    //       city: form.city,
-    //       state: form.state,
-    //       country: form.country,
-    //       address: form.address,
-    //     },
-    //     amenities: form.amenities.map((a) => a.trim()).filter(Boolean),
-    //     images: form.images
-    //       .split(",")
-    //       .map((u) => u.trim())
-    //       .filter(Boolean),
-    //   };
-
-    //   return await hotelsAPI.create(payload); //  YOU FORGOT THIS
-    // },
     mutationFn: async () => {
       const formData = new FormData();
 
@@ -108,7 +83,6 @@ export default function AdminDashboard() {
     onError: (e) =>
       showError(e?.response?.data?.message || "Failed to create hotel")
   });
-
 
 
   const onChange = (e) =>
@@ -212,12 +186,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* <Input
-            name="images"
-            placeholder="Image URLs (comma separated)"
-            value={form.images}
-            onChange={onChange}
-          /> */}
           <div>
             <div className="mb-2 text-sm text-muted-foreground">You can add up to 5 images</div>
             <input
@@ -230,10 +198,8 @@ export default function AdminDashboard() {
                 try {
                   const newFiles = Array.from(e.target.files);
                   setForm((prev) => {
-                    // Combine previous and new files, prevent duplicates by name+size
                     const existing = prev.images || [];
                     const allFiles = [...existing, ...newFiles];
-                    // Remove duplicates
                     const uniqueFiles = [];
                     const seen = new Set();
                     for (const file of allFiles) {
@@ -243,13 +209,11 @@ export default function AdminDashboard() {
                         uniqueFiles.push(file);
                       }
                     }
-                    // Limit to 5
                     if (uniqueFiles.length > 5) {
                       alert("Maximum 5 images allowed");
                       if (fileInputRef.current) fileInputRef.current.value = "";
                       return { ...prev };
                     }
-                    // Update previews
                     setImagePreviews(uniqueFiles.map((file) => URL.createObjectURL(file)));
                     return { ...prev, images: uniqueFiles };
                   });
@@ -258,7 +222,6 @@ export default function AdminDashboard() {
                 }
               }}
             />
-            {/* Image preview and remove option */}
             {form.images && form.images.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 {form.images.map((file, idx) => (
@@ -278,9 +241,7 @@ export default function AdminDashboard() {
                       onClick={() => {
                         setForm((prev) => {
                           const newImages = prev.images.filter((_, i) => i !== idx);
-                          // Update previews
                           setImagePreviews((prevPreviews) => prevPreviews.filter((_, i) => i !== idx));
-                          // Also clear file input if all images removed
                           if (newImages.length === 0 && fileInputRef.current) fileInputRef.current.value = "";
                           return { ...prev, images: newImages };
                         });
@@ -293,7 +254,6 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
-
 
           <Button
             variant="gradient"
@@ -329,4 +289,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-
