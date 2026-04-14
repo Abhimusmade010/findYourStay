@@ -12,21 +12,80 @@ export const fetchHotels=async()=>{
 
 }
 
-export const searchForHotel=async(data)=>{
-    const { city, state, country } = data;
-
-    const myhotels = await Hotel.find({
-        'location.city': city,
-        'location.state': state,
-        'location.country': country
-    });
-
-    if(!myhotels.length) {    
-        throw new Error( "No hotels found for the given location" );
+export const searchForHotel=async(filters)=>{
+    const query={};
+    // q is the search term that the user will enter in the search bar, it can be the name of the hotel, city, state or description of the hotel
+    //this check is the q exists or not if it exists then we will search for the hotel based on the name, city, state and description of the hotel
+    if(filters.q){
+        const regex=new RegExp(filters.q,'i');  //i for case insensitive search
+        query.$or=[
+            {name:regex},
+            {"location.city":regex},
+            {"location.state":regex},
+            {description:regex}
+        ];
     }
+    //exact location search based on city, state and country
+    if(filters.city){
+        query["location.city"]=new RegExp(filters.city,'i');
+    }
+    // if the state is provided in the filters then we will search for the hotel based on the state
+    if(filters.state){
+        query["location.state"]=new RegExp(filters.state,'i');
+    }   
+    // if the country is provided in the filters then we will search for the hotel based on the country
+    if(filters.country){
+        query["location.country"]=new RegExp(filters.country,'i');
+
+    }
+    //price range search based on minPrice and maxPrice
+    if(filters.minPrice || filters.maxPrice){
+        query.pricePerNight={};
+        if(filters.minPrice){
+            query.pricePerNight.$gte=Number(filters.minPrice);
+        }
+        if(filters.maxPrice){
+            query.pricePerNight.$lte=Number(filters.maxPrice);
+        }
+    }
+
+    //amenities for search  
+    //filters.amenities is an array of amenities that the user will select from the search filters, 
+    // we will search for the hotels that have all the amenities selected by the user
+    if(filters.amenities?.length){
+        query.amenities={$all:filters.amenities};
+    }
+
+    //$all operator is used to match all the elements of the array, 
+    // in this case we want to match all the amenities selected by the user with the amenities of the hotel
+
+
+    //availability
+    if(filters.available!==undefined){
+        query.availability=filters.available==="true";  //available is a string that we will get from the query parameters, we need to convert it to boolean
+    }
+
+    //sorting
+    //sortoptions is an object that contains the sorting options for the search results, we will sort the search results 
+    // based on the sorting option selected by the user
+    //price_asc
+    const sortOptions={
+        price_asc:{pricePerNight:1},
+        price_desc:{pricePerNight:-1},
+        newest:{createdAt:-1},
+        name:{name:1}
+    };
+    const sort=sortOptions[filters.sortBy] || {createdAt:-1};  //default sorting by newest
+
+    const hotels=await Hotel.find(query).sort(sort);
+
     return{
-        myhotels
-    }
+        hotels
+    };
+
+
+
+
 }
 
 export const fetchHotel=async(data)=>{
@@ -55,20 +114,6 @@ export const addHotel=async(data,userID)=>{
 
     return newHotel;
 }
-
-
-// export const delHotel=async(id,userID)=>{
-    
-//     const hotel=await Hotel.findById(id);
-//     if(!hotel){
-//         throw new Error ({message:"hotel not found"});
-
-//     }
-//     const deleted=await Hotel.deleteOne(id);
-//     return {
-//         deleted
-//     }
-// }
 
 
 export const modifyHotel=async(id,data,userId)=>{

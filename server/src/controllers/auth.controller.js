@@ -1,4 +1,5 @@
-import { registerUser, logUser, createAdmin, getAllAdmins, deleteAdmin } from "../services/auth.service.js";
+import {registerUser,logUser,createAdmin,getAllAdmins,deleteAdmin} from "../services/auth.service.js";
+
 
 // controller for handling user registration and login
 export const signUpUser = async (req, res) => {
@@ -25,6 +26,7 @@ export const signUpUser = async (req, res) => {
   }
 };
 
+
 // controller for handling user login
 export const loginUser = async (req, res) => {
   try {
@@ -48,7 +50,7 @@ export const loginUser = async (req, res) => {
 };
 
 
-// ─── SuperAdmin-only: create a new Admin account ───
+//SuperAdmin-only: create a new Admin account
 export const createAdminController = async (req, res) => {
   try {
     const data = req.body;

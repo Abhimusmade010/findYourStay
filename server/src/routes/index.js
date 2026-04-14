@@ -16,7 +16,6 @@ router.use("/bookings",bookingRoutes);
 router.use("/wishlists",wishlistRoutes);
 router.use("/reviews",reviewRoutes);
 router.use("/notifications", notificationRoutes);
-
 router.use("/super-admin", superAdminRoutes);
 
 export default router;

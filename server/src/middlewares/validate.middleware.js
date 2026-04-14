@@ -20,7 +20,7 @@ export const validate = (schema) => async (req, res, next) => {
     }));
 
     return res.status(400).json({
-      success: false,
+      status: "error",
       message: "Validation failed",
       errors: formattedErrors  // Array of { field, message }
     });

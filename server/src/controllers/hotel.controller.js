@@ -51,8 +51,9 @@ export const getAllHotels = async (req, res) => {
 export const searchHotel=async(req,res)=>{
 
   try{
-    const data= req.body;
-    // console.log("Data from the searchh Hotel",data);
+    // /const data= req.body;.
+    const data=req.query;
+    
     const myhotels=await searchForHotel(data);
     // console.log("Data from teh serahcing ",myhotels);
 
@@ -194,23 +195,6 @@ export const createHotel = async (req, res) => {
     });
   }
 };
-
-// export const deleteHotel=async(req,res)=>{
-//   try{
-//     const id=req.params.id;
-//     const userId=req.user._id;
-//     const result=await delHotel(id,userId);
-//     console.log("result from controller of delete hotel",result);
-//     res.status(200).json({
-//       message:"Hotel deleted successfully"
-//       // data:
-//     })
-
-//   }
-//   catch(error){
-
-//   }
-// }
 
 
 export const updateHotelController=async(req,res)=>{
