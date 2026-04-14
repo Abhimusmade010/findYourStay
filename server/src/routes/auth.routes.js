@@ -10,7 +10,8 @@ const router = express.Router();
 
 //Public routes
 // Anyone can register (always creates a Customer)
-router.post("/register", validate(registerUserSchema), signUpUser);
+router.post("/register", validate(registerUserSchema),signUpUser);
+
 
 // Anyone can login
 router.post("/login", validate(loginSchema), loginUser);
@@ -20,7 +21,6 @@ router.post("/login", validate(loginSchema), loginUser);
 
 // Only a SuperAdmin can create new Admin accounts
 router.post("/create-admin",validate(createAdminSchema),authMiddleware,requireRole("SuperAdmin"),createAdminController);
-
 
 export default router;
 
