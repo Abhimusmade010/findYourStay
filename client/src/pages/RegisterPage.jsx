@@ -12,7 +12,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("Customer")
+
   const [loading, setLoading] = useState(false)
 
   // const onSubmit = async (e) => {
@@ -29,7 +29,7 @@ export default function RegisterPage() {
     e.preventDefault()
     setFieldErrors({})
     setLoading(true)
-    const res = await register({ name, email, password, role })
+    const res = await register({ name, email, password })
     setLoading(false)
     if (res.success) {
       if (res.user?.role === 'Admin') navigate('/admin')
@@ -114,17 +114,7 @@ export default function RegisterPage() {
           ))}
         </div>
 
-        <div>
-          <label className="block text-sm mb-1">Role</label>
-          <select className="w-full h-10 rounded-md bg-background/50 border border-input px-3" value={role} onChange={(e) => setRole(e.target.value)}>
-            <option>Customer</option>
-            <option>Admin</option>
-          </select>
-          {fieldErrors.role?.map((err, i) => (
-            <p key={i} className="text-xs text-destructive mt-1">{err}</p>
-          ))}
-          {/* {fieldErrors.role && <p className="text-xs text-destructive mt-1">{fieldErrors.role}</p>} */}
-        </div>
+
 
 
         <Button type="submit" className="w-full" variant="gradient" disabled={loading}>
