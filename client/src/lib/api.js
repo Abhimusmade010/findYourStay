@@ -50,7 +50,8 @@ export const authAPI = {
 export const hotelsAPI = {
   getAll: () => api.get('/hotels/gethotels'),
   getById: (id) => api.get(`/hotels/gethotelDetails/${id}`),
-  search: (searchParams) => api.post('/hotels/search',searchParams),
+  
+  search: (searchParams) => api.get('/hotels/search', { params: searchParams }),
   
   // create: (data) => api.post('/hotels', data),
   create: (data)=>api.post('/hotels/create',data, {
