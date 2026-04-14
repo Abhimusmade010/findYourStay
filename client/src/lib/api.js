@@ -93,4 +93,17 @@ export const notificationsAPI = {
   markRead: (id) => api.patch(`/notifications/${id}/read`),
 }
 
+// SuperAdmin API
+export const superAdminAPI = {
+  // Admin management
+  createAdmin:  (data) => api.post('/super-admin/admins', data),
+  getAllAdmins:  ()     => api.get('/super-admin/admins'),
+  deleteAdmin:  (id)   => api.delete(`/super-admin/admins/${id}`),
+
+  // Hotel management
+  getAllHotels:  ()     => api.get('/super-admin/hotels'),
+  deleteHotel:  (id)   => api.delete(`/super-admin/hotels/${id}`),
+}
+
 export default api
+

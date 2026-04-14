@@ -57,17 +57,38 @@ const Navigation = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const navItems = [
+  // Nav items differ per role
+  const isSuperAdmin = user?.role === 'SuperAdmin'
+
+  const customerNavItems = [
     { path: '/', label: 'Home', icon: Home },
     { path: '/hotels', label: 'Hotels', icon: Building2 },
     { path: '/bookings', label: 'Bookings', icon: Calendar },
-    // notifications link inserted below for authenticated users
     { path: '/wishlist', label: 'Wishlist', icon: Heart },
   ]
 
-  // if user is logged in, insert notification link before wishlist
-  if (isAuthenticated) {
-    navItems.splice(3, 0, { path: '/notifications', label: 'Notifications', icon: Bell });
+  const superAdminNavItems = [
+    { path: '/super-admin', label: 'Dashboard', icon: Building2 },
+  ]
+
+  const adminNavItems = [
+    { path: '/admin', label: 'Dashboard', icon: Building2 },
+  ]
+
+  // Build the correct nav list
+  let navItems = isSuperAdmin
+    ? superAdminNavItems
+    : user?.role === 'Admin'
+      ? adminNavItems
+      : customerNavItems
+
+  // Insert notifications for regular authenticated users (not SuperAdmin/Admin)
+  if (isAuthenticated && user?.role === 'Customer') {
+    navItems = [
+      ...customerNavItems.slice(0, 3),
+      { path: '/notifications', label: 'Notifications', icon: Bell },
+      ...customerNavItems.slice(3),
+    ]
   }
 
   const handleLogout = () => {
@@ -148,9 +169,12 @@ const Navigation = () => {
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">
-                <Link to="/profile">
-                  <Button variant="outline" size="sm">Profile</Button>
-                </Link>
+                {/* Only show Profile link for non-superadmin users */}
+                {user?.role !== 'SuperAdmin' && (
+                  <Link to="/profile">
+                    <Button variant="outline" size="sm">Profile</Button>
+                  </Link>
+                )}
                 <motion.div
                   className="flex items-center space-x-2 px-3 py-2 rounded-md bg-secondary/50 hover:bg-secondary/70 transition-colors cursor-pointer"
                   whileHover={{ scale: 1.05 }}
