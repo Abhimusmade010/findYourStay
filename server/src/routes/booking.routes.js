@@ -5,11 +5,16 @@ import { requireRole } from "../middlewares/role.middleware.js";
 import { approveBookingController } from "../controllers/booking.controller.js";
 import { getmyHotelsPendingBookingController } from "../controllers/booking.controller.js";
 import { getMyConfirmedBookingsController } from "../controllers/booking.controller.js";
-import {denyBookingController,getActiveBookingsForCustomerController,getBookingHistoryForCustomerController,} from "../controllers/booking.controller.js";
+import {denyBookingController,getActiveBookingsForCustomerController,getBookingHistoryForCustomerController, getAdminBookingHistoryController} from "../controllers/booking.controller.js";
 
 import { cancelBookingController } from "../controllers/booking.controller.js";
 
 const router=express.Router();
+
+// routes for the booking of the hotels by the customers and also the approval and denial of the booking by the admin for the customers
+
+// route for the admin to get the past bookings of the hotels they own
+router.get("/gethistoryforAdmin", authMiddleware, requireRole("Admin"), getAdminBookingHistoryController);
 
 // routes for the booking of the hotels by the customers and also the approval and denial of the booking by the admin for the customers
 

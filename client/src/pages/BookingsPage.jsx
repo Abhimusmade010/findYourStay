@@ -32,7 +32,17 @@ export default function BookingsPage(){
       const res = await bookingsAPI.getHistory();
       return Array.isArray(res.data?.result) ? res.data.result : [];
     },
-    refetchInterval: 15000,
+    refetchInterval: 60000,
+  });
+
+  const { data: adminHistory = [] } = useQuery({
+    queryKey: ['bookings', 'admin-history'],
+    queryFn: async () => {
+      const res = await bookingsAPI.getAdminHistory();
+      return Array.isArray(res.data?.result) ? res.data.result : [];
+    },
+    enabled: isAdmin,
+    refetchInterval: 60000,
   });
 
 
@@ -97,11 +107,12 @@ export default function BookingsPage(){
     <div className="max-w-6xl mx-auto px-6 py-10 space-y-6">
       <div className="flex items-center gap-2">
         <TabButton id="mine" label="My Bookings" />
-        <TabButton id="history" label="History" />
+        <TabButton id="history" label="My History" />
         
         {isAdmin ? <>
           <TabButton id="pending" label="Pending (Admin)" />
           <TabButton id="owned" label="Confirmed (Admin)" />
+          <TabButton id="adminHistory" label="Past Bookings (Admin)" />
         </> : null}
 
       </div>
@@ -128,15 +139,44 @@ export default function BookingsPage(){
 
       {activeTab === 'history' && (
         <Card>
-          <CardHeader><CardTitle>Past Bookings</CardTitle></CardHeader>
+          <CardHeader><CardTitle>Your Past Bookings</CardTitle></CardHeader>
           <CardContent className="space-y-3">
-            {history.length === 0 ? <p className="text-sm text-muted-foreground">No past bookings.</p> : history.map(b => (
+            {history.length === 0 ? <p className="text-sm text-muted-foreground">No past bookings found.</p> : history.map(b => (
               <div key={b._id} className="glass-effect rounded-lg p-4 flex items-center justify-between">
                 <div>
                   <div className="font-medium">{b.hotel?.name}</div>
                   <div className="text-sm text-muted-foreground">{new Date(b.checkIn).toDateString()} → {new Date(b.checkOut).toDateString()}</div>
                 </div>
-                <div className="text-muted-foreground">{b.status}</div>
+                <div className="flex items-center gap-3">
+                  <span className={`text-xs px-2 py-1 rounded ${b.status === 'Cancelled' || b.status === 'Expired' ? 'bg-destructive/10 text-destructive' : 'bg-muted text-foreground'}`}>{b.status}</span>
+                  <span className="text-primary font-semibold">${b.totalPrice}</span>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {isAdmin && activeTab === 'adminHistory' && (
+        <Card>
+          <CardHeader><CardTitle>All Past or Cancelled Bookings (Your Hotels)</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            {adminHistory.length === 0 ? <p className="text-sm text-muted-foreground">No history found for your hotels.</p> : adminHistory.map(b => (
+              <div key={b._id} className="glass-effect rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium">{b.hotel?.name}</div>
+                    <div className="text-sm text-muted-foreground">{new Date(b.checkIn).toDateString()} → {new Date(b.checkOut).toDateString()}</div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`text-xs px-2 py-1 rounded ${b.status === 'Cancelled' || b.status === 'Expired' ? 'bg-destructive/10 text-destructive' : 'bg-muted text-foreground'}`}>{b.status}</span>
+                    <span className="text-primary font-semibold">${b.totalPrice}</span>
+                  </div>
+                </div>
+                <div className="mt-2 text-sm text-muted-foreground flex justify-between">
+                  <span>Customer: {b.customer?.name} ({b.customer?.email})</span>
+                  {b.cancellationReason && <span className="text-destructive italic">Reason: {b.cancellationReason}</span>}
+                </div>
               </div>
             ))}
           </CardContent>
@@ -155,9 +195,9 @@ export default function BookingsPage(){
                     <div className="text-sm text-muted-foreground">{new Date(b.checkIn).toDateString()} → {new Date(b.checkOut).toDateString()}</div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* use isLoading (mutation) rather than isPending */}
-                    <Button size="sm" variant="outline" onClick={() => denyMutation.mutate(b._id)} disabled={denyMutation.isLoading}>Deny</Button>
-                    <Button size="sm" variant="gradient" onClick={() => approveMutation.mutate(b._id)} disabled={approveMutation.isLoading}>Approve</Button>
+                    {/* use isPending for TanStack Query v5 */}
+                    <Button size="sm" variant="outline" onClick={() => denyMutation.mutate(b._id)} disabled={denyMutation.isPending}>Deny</Button>
+                    <Button size="sm" variant="gradient" onClick={() => approveMutation.mutate(b._id)} disabled={approveMutation.isPending}>Approve</Button>
                   </div>
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">

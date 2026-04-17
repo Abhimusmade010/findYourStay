@@ -51,7 +51,7 @@ export const hotelsAPI = {
   getAll: () => api.get('/hotels/gethotels'),
   getById: (id) => api.get(`/hotels/gethotelDetails/${id}`),
   
-  search: (searchParams) => api.get('/hotels/search', { params: searchParams }),
+  search: (filters) => api.get('/hotels/search', { params: filters }),
   
   // create: (data) => api.post('/hotels', data),
   create: (data)=>api.post('/hotels/create',data, {
@@ -74,6 +74,7 @@ export const bookingsAPI = {
 
   deny: (id) => api.post(`/bookings/${id}/deny`),
   getOwned: () => api.get('/bookings/owned/confirmed'),
+  getAdminHistory: () => api.get('/bookings/gethistoryforAdmin'),
 }
 
 // Reviews API

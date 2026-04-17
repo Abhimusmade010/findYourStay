@@ -37,7 +37,7 @@ export default function NotificationsPage() {
             notifications.map(n => (
               <div
                 key={n._id}
-                className={`border rounded-lg p-4 flex justify-between items-center ${n.read ? 'bg-black' : 'bg-black'}`}>
+                className={`border rounded-lg p-4 flex justify-between items-center transition-colors ${n.read ? 'bg-card' : 'bg-primary/5 border-primary/20'}`}>
                 <div>
                   <p>{n.message}</p>
                   <p className="text-xs text-muted-foreground">{new Date(n.createdAt).toLocaleString()}</p>
@@ -47,7 +47,7 @@ export default function NotificationsPage() {
                     size="sm"
                     variant="outline"
                     onClick={() => markReadMutation.mutate(n._id)}
-                    disabled={markReadMutation.isLoading}
+                    disabled={markReadMutation.isPending}
                   >
                     Mark read
                   </Button>
