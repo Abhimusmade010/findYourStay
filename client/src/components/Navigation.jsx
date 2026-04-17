@@ -73,6 +73,7 @@ const Navigation = () => {
 
   const adminNavItems = [
     { path: '/admin', label: 'Dashboard', icon: Building2 },
+    { path: '/bookings', label: 'Manage Bookings', icon: Calendar },
   ]
 
   // Build the correct nav list
@@ -82,12 +83,13 @@ const Navigation = () => {
       ? adminNavItems
       : customerNavItems
 
-  // Insert notifications for regular authenticated users (not SuperAdmin/Admin)
-  if (isAuthenticated && user?.role === 'Customer') {
+  // Insert notifications for regular authenticated users (not SuperAdmin)
+  if (isAuthenticated && (user?.role === 'Customer' || user?.role === 'Admin')) {
+    const insertIdx = user?.role === 'Admin' ? 1 : 3;
     navItems = [
-      ...customerNavItems.slice(0, 3),
+      ...navItems.slice(0, insertIdx),
       { path: '/notifications', label: 'Notifications', icon: Bell },
-      ...customerNavItems.slice(3),
+      ...navItems.slice(insertIdx),
     ]
   }
 
