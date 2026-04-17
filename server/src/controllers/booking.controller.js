@@ -1,6 +1,6 @@
 
 
-import { approveBookingService, createBookingService, getmyHotelsPendingBookingService, getConfirmedBookingService, getActiveBookingsForCustomerService, getBookingHistoryForCustomerService, denyBookingService, cancelBookingService } from "../services/booking.service.js";
+import { approveBookingService, createBookingService, getmyHotelsPendingBookingService, getConfirmedBookingService, getActiveBookingsForCustomerService, getBookingHistoryForCustomerService, getAdminBookingHistoryService, denyBookingService, cancelBookingService } from "../services/booking.service.js";
 
 
 export const cancelBookingController = async (req, res) => {
@@ -177,6 +177,23 @@ export const denyBookingController = async (req, res) => {
     return res.status(200).json({
       status: "success",
       message: "Booking denied",
+      result
+    });
+  } catch (error) {
+    return res.status(400).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+export const getAdminBookingHistoryController = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const result = await getAdminBookingHistoryService(userId);
+    return res.status(200).json({
+      status: "success",
+      message: "Admin booking history fetched successfully",
       result
     });
   } catch (error) {

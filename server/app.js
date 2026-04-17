@@ -1,33 +1,48 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors"
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
 dotenv.config();
+
 import { swaggerSpec } from "./src/config/swagger.js";
 import swaggerUi from "swagger-ui-express";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
-// Security middlewares
 import routes from './src/routes/index.js'
+import { errorHandler } from "./src/middlewares/error.middleware.js";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-app.use(express.json());
-app.use(helmet());
 
+// Security middlewares
+app.use(helmet({
+  contentSecurityPolicy: false, 
+}));
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  "http://localhost:5173",
+].filter(Boolean);
 
 app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    /^http:\/\/localhost:\d+$/   
-  ],
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1 || /^http:\/\/localhost:\d+$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 
-// order of cors helmet and rate limit is as:
-// 1. CORS to handle cross-origin requests and preflight checks
-// 2. Helmet to set secure HTTP headers
-// 3. Rate limiting to prevent abuse after security checks are in place
-
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 //  Strict limiter for auth
 const authLimiter = rateLimit({
@@ -43,19 +58,32 @@ const globalLimiter = rateLimit({
 });
 
 app.use('/api/auth', authLimiter);
-app.use(globalLimiter);
+app.use('/api', globalLimiter);
 
+// API Routes
+app.use("/api", routes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Static Files & API Fallback
+const clientBuildPath = path.join(__dirname, "../client/dist");
 
-app.use(express.urlencoded({extended:true}));
+if (fs.existsSync(clientBuildPath)) {
+  app.use(express.static(clientBuildPath));
+  app.get("*", (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(clientBuildPath, "index.html"));
+    }
+  });
+} else {
 
-app.use("/api", routes);
+  app.get("/", (req, res) => {
+    res.json({ status: "success", message: "FindYourStay API is active" });
+  });
+}
 
 
-app.get("/", (req, res) => {
-  res.send("Server is running...");
-});
+// Global Error Handler
+app.use(errorHandler);
 
 export default app;
 

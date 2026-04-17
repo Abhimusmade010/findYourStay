@@ -48,25 +48,21 @@ export const getActiveBookingsForCustomerService = async (customerId) => {
 };
 
 
-export const getConfirmedBookingService=async(userId)=>{
-  // console.log("booking Id is ",bookingId);
-  
-  //get the hotel created by the user Id
-
+export const getConfirmedBookingService = async (userId) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const hotels = await Hotel.find({ createdBy: userId });
-
-
   const hotelIds = hotels.map(hotel => hotel._id);
 
-
+  // Only upcoming confirmed bookings
   const confirmedBookings = await Booking.find({
     hotel: { $in: hotelIds },
-    status: "Confirmed"
+    status: "Confirmed",
+    checkOut: { $gte: today }
   }).populate("hotel customer");
 
   return confirmedBookings;
-
 }
 
 
@@ -138,12 +134,17 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   // check first if the hotel user is booking is present in the wishlist if present remove it 
   // const hotelWishListArray=User.wishlist
   
-  // sent notification to hotel admin that some one has booked the hotel and waiting for approval
+  // 6️⃣ Send notifications
   try {
-    const msg = `You have a new booking request for ${hotel.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()}. Please review and approve or deny the booking.`;
-    await createNotification(hotel.createdBy, msg);
+    // Notify Hotel Admin
+    const adminMsg = `New booking request for "${hotel.name}" from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()}. Awaiting your approval.`;
+    await createNotification(hotel.createdBy, adminMsg);
+
+    // Notify Customer
+    const customerMsg = `Your booking request for "${hotel.name}" (${booking.checkIn.toDateString()} - ${booking.checkOut.toDateString()}) has been sent. You will be notified once the admin reviews it.`;
+    await createNotification(customerId, customerMsg);
   } catch (e) { 
-    console.error("Failed to create booking notification for admin", e.message);
+    console.error("Failed to create booking notifications", e.message);
   }
 
 
@@ -207,7 +208,7 @@ export const  approveBookingService=async(userId,bookingId)=>{
     //now if user has added the hotel in wishlist first and booked and booking in approved then it should removed from the wishlist 
 
      try {
-      const msg = `Your booking at ${hotel.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()} has been approved.`;
+      const msg = `✅ Your booking at "${hotel.name}" (${booking.checkIn.toDateString()} - ${booking.checkOut.toDateString()}) has been CONFIRMED by the admin! Enjoy your stay.`;
       await createNotification(booking.customer, msg);
     } catch (e) {
       console.error("Failed to create approval notification", e.message);
@@ -260,11 +261,28 @@ export const getBookingHistoryForCustomerService = async (customerId) => {
     customer: customerId,
     $or: [
       { checkOut: { $lt: today } },
-       { status: { $in: ["Cancelled", "Completed", "Expired"] } },
+      { status: { $in: ["Cancelled", "Completed", "Expired"] } },
     ],
   })
     .populate("hotel")
     .sort({ checkIn: -1 });
+};
+
+export const getAdminBookingHistoryService = async (userId) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const hotels = await Hotel.find({ createdBy: userId });
+  const hotelIds = hotels.map(hotel => hotel._id);
+
+  // History for Admin = past bookings OR cancelled/expired bookings
+  return await Booking.find({
+    hotel: { $in: hotelIds },
+    $or: [
+      { checkOut: { $lt: today } },
+      { status: { $in: ["Cancelled", "Completed", "Expired"] } }
+    ]
+  }).populate("hotel customer").sort({ checkIn: -1 });
 };
 
 export const denyBookingService = async (adminUserId, bookingId) => {
@@ -287,7 +305,7 @@ export const denyBookingService = async (adminUserId, bookingId) => {
   await booking.save();
 
   try {
-    const msg = `Your booking at ${booking.hotel?.name} from ${booking.checkIn.toDateString()} to ${booking.checkOut.toDateString()} has been denied.`;
+    const msg = `❌ Your booking at "${booking.hotel?.name}" (${booking.checkIn.toDateString()} - ${booking.checkOut.toDateString()}) was denied by the admin.`;
     await createNotification(booking.customer, msg);
   } catch (e) {
     console.error("Failed to create denial notification", e.message);

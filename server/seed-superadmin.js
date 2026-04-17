@@ -32,7 +32,8 @@ const SUPER_ADMIN = {
 
 
 const seedSuperAdmin = async () => {
-
+  console.log(process.env.MONGO_URI);
+  
   try {
     // Step 1: Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
