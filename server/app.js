@@ -16,7 +16,6 @@ import { errorHandler } from "./src/middlewares/error.middleware.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 
 // Security middlewares
@@ -80,7 +79,6 @@ if (fs.existsSync(clientBuildPath)) {
     res.json({ status: "success", message: "FindYourStay API is active" });
   });
 }
-
 
 // Global Error Handler
 app.use(errorHandler);

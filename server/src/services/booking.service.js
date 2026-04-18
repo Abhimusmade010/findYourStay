@@ -1,7 +1,7 @@
 import Booking from "../models/booking.model.js";
 import Hotel from "../models/hotel.model.js";
 import User from "../models/user.model.js"
-import {normalizeDate,validateDateRange,buildDateRangeArray} from "../utils/date.util.js";
+import { normalizeDate, validateDateRange, buildDateRangeArray } from "../utils/date.util.js";
 import { createNotification } from "./notification.service.js";
 
 const PENDING_BOOKING_EXPIRY_MINUTES = Number(process.env.PENDING_BOOKING_EXPIRY_MINUTES || 30);
@@ -66,7 +66,7 @@ export const getConfirmedBookingService = async (userId) => {
 }
 
 
-export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}) => {
+export const createBookingService = async ({ hotelId, checkIn, checkOut, customerId }) => {
 
   // 1️⃣ Find hotel
   // console.log("customer id is ",customerId)
@@ -129,11 +129,11 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
   // console.log("final boking is ",booking);
   //if bookking is done then remove this hotel from the wish list of the user 
   // we have booklist array field in user schema 
-  
+
 
   // check first if the hotel user is booking is present in the wishlist if present remove it 
   // const hotelWishListArray=User.wishlist
-  
+
   // 6️⃣ Send notifications
   try {
     // Notify Hotel Admin
@@ -143,7 +143,7 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     // Notify Customer
     const customerMsg = `Your booking request for "${hotel.name}" (${booking.checkIn.toDateString()} - ${booking.checkOut.toDateString()}) has been sent. You will be notified once the admin reviews it.`;
     await createNotification(customerId, customerMsg);
-  } catch (e) { 
+  } catch (e) {
     console.error("Failed to create booking notifications", e.message);
   }
 
@@ -155,78 +155,113 @@ export const createBookingService = async ({hotelId,checkIn,checkOut,customerId}
     },
     { new: true }
   );
-  
+
   return booking;
 };
 
-export const  approveBookingService=async(userId,bookingId)=>{
-   console.log("in approveBookingService")
-  // console.log("booking Id is ",bookingId);
-  const booking = await Booking.findById(bookingId).populate("hotel");
-  if(!booking){
-    throw new Error("Booking not found")
-  }
-  if(booking.status!="Pending"){
-    throw new Error("Only pending bookings can be approved")
-  }
-  if (String(booking.hotel.createdBy) !== String(userId)){
-    throw new Error("Not authorized to approve this booking")
-  }
-  
-  // console.log("hotel id in booking is",booking.hotel._id)
-  // const hotel= await Hotel.findbyId(booking.hotel)
-  const hotel = booking.hotel;
-  const dateRange = buildDateRangeArray(booking.checkIn, booking.checkOut);
+export const approveBookingService = async (userId, bookingId) => {
+  //  console.log("in approveBookingService")
 
-  const overlaps = hotel.bookedDates.some(range => {
+  // console.log("booking Id is ",bookingId);
+
+  //start session for transaction
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+
+    //find booking associatw with this session
+    const booking = await Booking.findById(bookingId).populate("hotel").session(session);
+
+    if (!booking) {
+      throw new Error("Booking not found")
+    }
+    if (booking.status != "Pending") {
+      throw new Error("Only pending bookings can be approved")
+    }
+    if (String(booking.hotel.createdBy) !== String(userId)) {
+      throw new Error("Not authorized to approve this booking")
+    }
+
+    // console.log("hotel id in booking is",booking.hotel._id)
+    // const hotel= await Hotel.findbyId(booking.hotel)
+    const hotel = booking.hotel;
+    const dateRange = buildDateRangeArray(booking.checkIn, booking.checkOut);
+
+    const overlaps = hotel.bookedDates.some(range => {
       if (!Array.isArray(range) || range.length === 0) return false;
-      const existingStart = new Date(range[0]).setHours(0,0,0,0);
+      const existingStart = new Date(range[0]).setHours(0, 0, 0, 0);
       const existingEndExclusive = new Date(range[range.length - 1]);
-      existingEndExclusive.setHours(0,0,0,0);
+      existingEndExclusive.setHours(0, 0, 0, 0);
       existingEndExclusive.setDate(existingEndExclusive.getDate() + 1); // make it exclusive for comparison
 
-      const newStart = new Date(dateRange[0]).setHours(0,0,0,0);
+      const newStart = new Date(dateRange[0]).setHours(0, 0, 0, 0);
       const newEndExclusive = new Date(dateRange[dateRange.length - 1] || dateRange[0]);
-      newEndExclusive.setHours(0,0,0,0);
+      newEndExclusive.setHours(0, 0, 0, 0);
       newEndExclusive.setDate(newEndExclusive.getDate() + 1);
 
       // intervals [start, end) overlap if start < otherEnd && otherStart < end
       return (newStart < existingEndExclusive) && (existingStart < newEndExclusive);
-  });
-  if(overlaps){
-    throw new Error("Selected dates overlap an existing booking")
-  }
+    });
+    if (overlaps) {
+      throw new Error("Selected dates overlap an existing booking")
+    }
 
     hotel.bookedDates.push(dateRange);
     hotel.availability = false;
     recalculateHotelAvailability(hotel);
-    await hotel.save();
+
+    //pass the session to the save method ,now hotel.save() will run inside the transaction
+    await hotel.save({ session });
+
+
     booking.status = "Confirmed";
     booking.expiresAt = null;
-    await booking.save();
+
+    //now booking.save() will run inside the transaction
+    // if this fails the hotel.save() will be rolled back
+    await booking.save({ session });
+
+    //commit the trasaction
+    //this is the moment when both hotel.save() and booking.save() are committed in the database
+    await session.commitTransaction();
 
     //now if user has added the hotel in wishlist first and booked and booking in approved then it should removed from the wishlist 
 
-     try {
+    try {
       const msg = `✅ Your booking at "${hotel.name}" (${booking.checkIn.toDateString()} - ${booking.checkOut.toDateString()}) has been CONFIRMED by the admin! Enjoy your stay.`;
       await createNotification(booking.customer, msg);
     } catch (e) {
       console.error("Failed to create approval notification", e.message);
     }
 
-    return {booking,hotel}
+    return { booking, hotel }
+  }
+  catch (error) {
+    //if anything fails inside the try block all changes are reverted back
+
+    await session.abortTransaction();
+    throw error;
+
+  }
+  finally {
+    //alwady end the session ,
+    // if not ended by us it will be ended by the nodejs because nodejs has garbage collector to keep checking the memory leaks 
+    await session.endSession();
+  }
+
+
 
 }
 
 
-export const getmyHotelsPendingBookingService=async(userId)=>{
+export const getmyHotelsPendingBookingService = async (userId) => {
 
   //get all bookings for the hotel 
   console.log("in the getmyHotels Pending BookingController")
 
-  const hotel=await Hotel.find({createdBy:userId});
+  const hotel = await Hotel.find({ createdBy: userId });
   // console.log("hotel crteated by admin is ",hotel);
-  
+
   if (!hotel.length) {
     return [];
   }
@@ -236,14 +271,14 @@ export const getmyHotelsPendingBookingService=async(userId)=>{
 
   // const hotelId=hotel._id;
   // console.log("hotel id is",hotelIds);
-  
+
 
   const bookings = await Booking.find({
     hotel: { $in: hotelIds },
     status: "Pending"
   }).populate("customer hotel");
 
-  
+
   // console.log("Bookings data is ",bookings);
 
   return bookings;
