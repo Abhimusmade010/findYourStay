@@ -17,114 +17,114 @@ export const cancelBookingController = async (req, res) => {
     });
   } catch (error) {
     return res.status(400).json({
-     
+
       status: "error",
       message: error.message,
     });
   }
-  
+
 };
 
-export const createBookingcontroller=async (req,res)=>{
+export const createBookingcontroller = async (req, res) => {
 
 
-    try{
-        const { hotelId, checkIn, checkOut } = req.body;
-        const customerId=req.user._id;
+  try {
+    const { hotelId, checkIn, checkOut } = req.body;
+    const customerId = req.user._id;
 
 
-        const booking=await createBookingService({hotelId,checkIn,checkOut,customerId});
+    const booking = await createBookingService({ hotelId, checkIn, checkOut, customerId });
 
-        res.status(200).json({
-            status: "success",
-            result:booking,
-            message:"Booking created successfully.Awaiting admin approval!!",
-        })
-        
-    }catch(error){
-        res.status(400).json({
-          
-            status: "error",
-            error: error.message
-        })
-    }
+    res.status(200).json({
+      status: "success",
+      result: booking,
+      message: "Booking created successfully.Awaiting admin approval!!",
+    })
+
+  } catch (error) {
+    res.status(400).json({
+
+      status: "error",
+      error: error.message
+    })
+  }
 
 }
 
-export const getMyConfirmedBookingsController=async(req,res)=>{
-    try{
-        // const {bookingId}=req.body;
+export const getMyConfirmedBookingsController = async (req, res) => {
+  try {
+    // const {bookingId}=req.body;
 
-        const userId=req.user._id;
-        const result=await getConfirmedBookingService(userId);
+    const userId = req.user._id;
+    const result = await getConfirmedBookingService(userId);
 
-        res.status(200).json({
-            status: "success",
-            message:"successfully added confirmed booking by the admin!!",
-            result
-        })
-    }catch(error){
-        res.status(400).json({
-            // success:false,
-            status: "error",
-            error:error.message
-        })
-    }
+    res.status(200).json({
+      status: "success",
+      message: "successfully added confirmed booking by the admin!!",
+      result
+    })
+  } catch (error) {
+    res.status(400).json({
+      // success:false,
+      status: "error",
+      error: error.message
+    })
+  }
 }
 
-export const approveBookingController=async(req,res)=>{
+export const approveBookingController = async (req, res) => {
 
-    try{
-        const {bookingId}=req.body;
-        const userId=req.user._id;
+  try {
+    const { bookingId } = req.body;
+    const userId = req.user._id;
 
-        const result =await approveBookingService(userId,bookingId);
-        res.status(200).json({
-            status: "success",
-            message:"successfully confirmed booking by the admin for you!!",
-            result
-        })
-    }
-    catch(error){
-        res.status(400).json({
-            status: "error",
-            error:error.message
-        })
-    }
+    const result = await approveBookingService(userId, bookingId);
+    res.status(200).json({
+      status: "success",
+      message: "successfully confirmed booking by the admin for you!!",
+      result
+    })
+  }
+  catch (error) {
+    res.status(400).json({
+      status: "error",
+      error: error.message
+    })
+  }
 }
 
-export const getmyHotelsPendingBookingController=async(req,res)=>{
-    try{
-        console.log("in getmy Hotels Pending Booking Controller")
-        const userId=req.user._id;
+export const getmyHotelsPendingBookingController = async (req, res) => {
+  try {
+    console.log("in getmy Hotels Pending Booking Controller")
+    const userId = req.user._id;
 
-        // const hotelId=req.body;/
-        
-        const result=await getmyHotelsPendingBookingService(userId);
-        console.log("result in contoller is",result);
-        
-        res.status(200).json({
-            status: "success",
-            message:"Boookings fetch successfully!!",
-            result
-        })
-    }catch(error){
+    // const hotelId=req.body;/
 
-        res.status(400).json({
-            status: "error",
-            error:error.message
-        })
+    const result = await getmyHotelsPendingBookingService(userId);
+    console.log("result in contoller is", result);
 
-    }
+    res.status(200).json({
+      status: "success",
+      message: "Boookings fetch successfully!!",
+      result
+    })
+  } catch (error) {
+
+    res.status(400).json({
+      status: "error",
+      error: error.message
+    })
+
+  }
 
 }
 
 // export const getConfirmedBookingController=async(req,res)=>{
 //     try{
 //         const data=req.body;
-    
+
 //         //i want to get the bookings that are confirmed by the admin 
-        
+
 //     }
 //     catch(error){
 
@@ -139,7 +139,7 @@ export const getActiveBookingsForCustomerController = async (req, res) => {
       {
         status: "success",
         message: "Active bookings fetched successfully",
-        result:result
+        result: result
       }
     );
   } catch (error) {
@@ -203,3 +203,4 @@ export const getAdminBookingHistoryController = async (req, res) => {
     });
   }
 };
+
