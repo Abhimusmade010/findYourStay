@@ -38,7 +38,7 @@ router.get("/getactiveforCustomer", authMiddleware, getActiveBookingsForCustomer
 
 // route for the admin to get the pending bookings of the hotels they own
 router.get('/getpendingforAdmin',authMiddleware,requireRole("Admin"),getmyHotelsPendingBookingController);
-
+    
 //approve booking by admin
 router.post('/approve',authMiddleware,requireRole('Admin'),approveBookingController);
 

@@ -1,5 +1,6 @@
 import Booking from "../models/booking.model.js";
 import Hotel from "../models/hotel.model.js";
+import mongoose from "mongoose";
 import User from "../models/user.model.js"
 import { normalizeDate, validateDateRange, buildDateRangeArray } from "../utils/date.util.js";
 import { createNotification } from "./notification.service.js";
@@ -163,12 +164,14 @@ export const approveBookingService = async (userId, bookingId) => {
   //  console.log("in approveBookingService")
 
   // console.log("booking Id is ",bookingId);
-
-  //start session for transaction
+  
+  //step 1:start session for transaction
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
 
+
+    //step 2:
     //find booking associatw with this session
     const booking = await Booking.findById(bookingId).populate("hotel").session(session);
 
@@ -207,21 +210,23 @@ export const approveBookingService = async (userId, bookingId) => {
     }
 
     hotel.bookedDates.push(dateRange);
-    hotel.availability = false;
+    // hotel.availability = false;
     recalculateHotelAvailability(hotel);
-
-    //pass the session to the save method ,now hotel.save() will run inside the transaction
+    
+    //step 3:save the hotel
+    //pass the session to the save method,now hotel.save() will run inside the transaction
     await hotel.save({ session });
 
 
     booking.status = "Confirmed";
     booking.expiresAt = null;
 
+    //step 4:save the booking
     //now booking.save() will run inside the transaction
     // if this fails the hotel.save() will be rolled back
     await booking.save({ session });
 
-    //commit the trasaction
+    //step 5:commit the trasaction
     //this is the moment when both hotel.save() and booking.save() are committed in the database
     await session.commitTransaction();
 
@@ -238,18 +243,17 @@ export const approveBookingService = async (userId, bookingId) => {
   }
   catch (error) {
     //if anything fails inside the try block all changes are reverted back
-
+    //step 6:abort the transaction
     await session.abortTransaction();
     throw error;
 
   }
   finally {
+    //step 7:end the session
     //alwady end the session ,
     // if not ended by us it will be ended by the nodejs because nodejs has garbage collector to keep checking the memory leaks 
     await session.endSession();
   }
-
-
 
 }
 

@@ -1,7 +1,7 @@
 
 
 import { approveBookingService, createBookingService, getmyHotelsPendingBookingService, getConfirmedBookingService, getActiveBookingsForCustomerService, getBookingHistoryForCustomerService, getAdminBookingHistoryService, denyBookingService, cancelBookingService } from "../services/booking.service.js";
-
+// import mongoose from "mongoose";
 
 export const cancelBookingController = async (req, res) => {
 
@@ -75,7 +75,15 @@ export const getMyConfirmedBookingsController = async (req, res) => {
 export const approveBookingController = async (req, res) => {
 
   try {
-    const { bookingId } = req.body;
+    const bookingId = req.body?.bookingId ?? req.params?.id ?? req.body?.id;
+
+    if (!bookingId) {
+      return res.status(400).json({
+        status: "error",
+        message: "bookingId is required",
+      });
+    }
+
     const userId = req.user._id;
 
     const result = await approveBookingService(userId, bookingId);
@@ -88,7 +96,7 @@ export const approveBookingController = async (req, res) => {
   catch (error) {
     res.status(400).json({
       status: "error",
-      error: error.message
+      message: error.message
     })
   }
 }

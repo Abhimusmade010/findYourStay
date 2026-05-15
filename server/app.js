@@ -40,6 +40,8 @@ app.use(cors({
   credentials: true
 }));
 
+app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -79,6 +81,14 @@ if (fs.existsSync(clientBuildPath)) {
     res.json({ status: "success", message: "FindYourStay API is active" });
   });
 }
+
+// ===========Heath Check Endpoint===========
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    uptime: process.uptime(),
+  });
+});
 
 // Global Error Handler
 app.use(errorHandler);
