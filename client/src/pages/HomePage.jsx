@@ -45,7 +45,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
           >
-            Book premium hotels with a sleek, modern experience. Neon vibes, glass surfaces, and silky animations.
+            Book premium hotels with a sleek, modern experience.
           </motion.p>
 
           {/* Search Bar */}

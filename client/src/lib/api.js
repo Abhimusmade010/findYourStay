@@ -70,7 +70,14 @@ export const bookingsAPI = {
   getHistory: () => api.get('/bookings/gethistoryforCustomer'),
   getActive: () => api.get('/bookings/getactiveforCustomer'),
   getPending: () => api.get('/bookings/getpendingforAdmin'),
-  approve: (id) => api.post(`/bookings/approve`, { bookingId: id }),  
+  // approve: (bookingOrId) => {
+  //   const bookingId = typeof bookingOrId === 'object'
+  //     ? bookingOrId?._id ?? bookingOrId?.id
+  //     : bookingOrId
+
+  //   return api.post('/bookings/approve', { bookingId })
+  // },
+  approve:(bookingId) => api.post('/bookings/approve', { bookingId }),
 
   deny: (id) => api.post(`/bookings/${id}/deny`),
   getOwned: () => api.get('/bookings/owned/confirmed'),
