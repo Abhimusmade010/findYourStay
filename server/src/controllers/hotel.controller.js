@@ -5,47 +5,89 @@ import { uploadToCloudinary } from "../utils/uploadService.js";
 
 
 
+// export const getAllHotels = async (req, res) => {
+//   try {
+//     const cacheKey="all_hotels";
+//     const getCacheData=await redisClient.get(cacheKey);
+
+//     if(getCacheData){
+//       return res.status(200).json({
+//         status: "success",
+//         message: "Hotels fetched from cache",
+//         result: JSON.parse(getCacheData)
+//       })
+//     }
+    
+    
+//     // if cache miss then fetch from database
+//     const result=await fetchHotels();
+
+//     //store in redis with an expiry time of 5 mins
+//     await redisClient.set(cacheKey,JSON.stringify(result),{
+//       EX:300        //expire in 5 mins
+//     }) 
+
+
+//     //200 because for succes not 201 becuase nothing is creating here we are just fetching the data from the database
+//     res.status(200).json({   
+//       status: "success",   
+//       message: "Hotels fetched from database",
+//       result  
+//     });
+
+
+//   } 
+//   // catch any error that occurs during the process and send a 400 bad request response with the error message
+//   catch (error) {
+//     res.status(400).json({ 
+//       status: "error",
+//       error: error.message 
+//     });
+//   }
+
+// };
+
+
+
 export const getAllHotels = async (req, res) => {
+  const cacheKey = "all_hotels";
+
   try {
-    const cacheKey="all_hotels";
-    const getCacheData=await redisClient.get(cacheKey);
+    const cached = await redisClient.get(cacheKey);
 
-    if(getCacheData){
-      return res.status(200).json({
-        status: "success",
-        message: "Hotels fetched from cache",
-        result: JSON.parse(getCacheData)
-      })
-    }
-    
-    
-    // if cache miss then fetch from database
-    const result=await fetchHotels();
-
-    //store in redis with an expiry time of 5 mins
-    await redisClient.set(cacheKey,JSON.stringify(result),{
-      EX:300        //expire in 5 mins
-    }) 
-
-
-    //200 because for succes not 201 becuase nothing is creating here we are just fetching the data from the database
-    res.status(200).json({   
-      status: "success",   
-      message: "Hotels fetched from database",
-      result  
-    });
-
-
+      if (cached) {
+        return res.status(200).json({
+          status: "success",
+          message: "Hotels fetched from cache",
+          result: JSON.parse(cached),
+        });
+      }
+      
   } 
-  // catch any error that occurs during the process and send a 400 bad request response with the error message
-  catch (error) {
-    res.status(400).json({ 
-      status: "error",
-      error: error.message 
-    });
+  catch (err) {
+    console.log("Redis unavailable, fetching from MongoDB");
   }
 
+  // Always fetch from MongoDB if cache misses or Redis is down
+  const result = await fetchHotels();
+
+  // Try to cache, but don't fail if Redis is down
+  try {
+    await redisClient.set(cacheKey, JSON.stringify(result), {
+      EX: 300,
+    });
+  } catch (err) {
+    console.log("Could not cache data");
+  }
+
+  return res.status(200).json({
+    status: "success",
+    message: "Hotels fetched from database",
+    result,
+  });
 };
+
+
 
 
 export const searchHotel=async(req,res)=>{
