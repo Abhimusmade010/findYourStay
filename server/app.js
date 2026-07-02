@@ -29,6 +29,7 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
+<<<<<<< HEAD
   origin: (origin, callback) => {
     if (!origin) return callback(null, true);
     if (allowedOrigins.indexOf(origin) !== -1 || /^http:\/\/localhost:\d+$/.test(origin)) {
@@ -37,6 +38,11 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
+=======
+  origin: [
+    process.env.FRONTEND_URL || "http://localhost:3000",
+  ],
+>>>>>>> 641697b (Handled Redis downtime)
   credentials: true
 }));
 
