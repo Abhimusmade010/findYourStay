@@ -45,6 +45,7 @@ import bcrypt from "bcryptjs"; // Use bcryptjs for compatibility with Node.js 18
 //     token,
 //   };
 // };
+
 const buildUser = async ({ name, email, password, role }) => {
 
     console.log("1. buildUser started");
