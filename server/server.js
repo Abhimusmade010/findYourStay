@@ -12,7 +12,7 @@ const startServer = async () => {
  
   try{
     await connectDB();
-    // await connectRedis();
+    await connectRedis();
     startPendingBookingExpiryJob();
 
     app.listen(PORT, () => {
