@@ -29,21 +29,24 @@ const allowedOrigins = [
 ].filter(Boolean);
 
 app.use(cors({
-
+  
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.indexOf(origin) !== -1 || /^http:\/\/localhost:\d+$/.test(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+    // Allow requests without an Origin header
 
-  origin: [
-    process.env.FRONTEND_URL || "http://localhost:3000",
-  ],
-  credentials: true
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin) ||/^http:\/\/localhost:\d+$/.test(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
 }));
+
+
 
 app.set("trust proxy", 1);
 
@@ -94,6 +97,7 @@ app.get("/health", (req, res) => {
     uptime: process.uptime(),
   });
 });
+
 
 // Global Error Handler
 app.use(errorHandler);

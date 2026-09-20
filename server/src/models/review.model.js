@@ -1,15 +1,6 @@
 import mongoose from "mongoose";
 
-/**
- * Review model
- *
- * Used by frontend:
- * - GET  `/api/reviews/hotel/:hotelId` (list reviews for a hotel)
- * - POST `/api/reviews`              (create a review)
- *
- * Design choice:
- * - One review per (hotel, customer). This keeps UI simple and prevents spam.
- */
+
 
 const reviewSchema = new mongoose.Schema(
   {

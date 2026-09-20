@@ -13,8 +13,10 @@ export const signUpUser = async (req, res) => {
     });
   }
   catch (error) {
-    if (error.message === "EMAIL_EXISTS") {
+    if (error.message === "EMAIL_EXISTS"){
+
       return res.status(409).json({ status: "error", message: "Email already exists", error: error.message });
+      
     }
     if (error.message === "VALIDATION_ERROR") {
       return res.status(422).json({ status: "error", message: "Invalid input data", error: error.message });
