@@ -376,7 +376,7 @@ export default function HotelsPage() {
                       {/* Price + CTA */}
                       <div className="flex items-center justify-between pt-1">
                         <div>
-                          <span className="text-primary font-bold text-lg">${h.pricePerNight}</span>
+                          <span className="text-primary font-bold text-lg">{h.pricePerNight}</span>
                           <span className="text-muted-foreground text-xs">/night</span>
                         </div>
                         <Button
