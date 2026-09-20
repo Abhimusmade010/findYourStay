@@ -2,30 +2,86 @@ import {registerUser,logUser,createAdmin,getAllAdmins,deleteAdmin} from "../serv
 
 
 // controller for handling user registration and login
-export const signUpUser = async (req, res) => {
-  try {
-    const data = req.body;
-    const result = await registerUser(data);
-    res.status(201).json({
-      status: "success",
-      message: "User registered successfully",
-      result: result
-    });
-  }
-  catch (error) {
-    if (error.message === "EMAIL_EXISTS"){
+// export const signUpUser = async (req, res) => {
+//   try {
+//     const data = req.body;
+//     const result = await registerUser(data);
+//     res.status(201).json({
+//       status: "success",
+//       message: "User registered successfully",
+//       result: result
+//     });
+//   }
+//   catch (error) {
+//     if (error.message === "EMAIL_EXISTS"){
 
-      return res.status(409).json({ status: "error", message: "Email already exists", error: error.message });
+//       return res.status(409).json({ status: "error", message: "Email already exists", error: error.message });
       
+//     }
+//     if (error.message === "VALIDATION_ERROR") {
+//       return res.status(422).json({ status: "error", message: "Invalid input data", error: error.message });
+//     }
+//     if (error.message === "WEAK_PASSWORD") {
+//       return res.status(422).json({ status: "error", message: "Password is too weak", error: error.message });
+//     }
+//     return res.status(500).json({ status: "error", message: "Internal server error", error: error.message });
+//   }
+// };
+export const signUpUser = async (req, res) => {
+    try {
+        console.log("REGISTER CONTROLLER HIT");
+        console.log("REGISTER DATA:", {
+            name: req.body.name,
+            email: req.body.email,
+            hasPassword: !!req.body.password
+        });
+
+        const data = req.body;
+
+        const result = await registerUser(data);
+
+        console.log("REGISTER SUCCESS");
+
+        res.status(201).json({
+            status: "success",
+            message: "User registered successfully",
+            result: result
+        });
+
+    } catch (error) {
+
+        console.error("========== REGISTER ERROR ==========");
+        console.error("Message:", error.message);
+        console.error("Stack:", error.stack);
+        console.error("Full error:", error);
+        console.error("====================================");
+
+        if (error.message === "EMAIL_EXISTS") {
+            return res.status(409).json({
+                status: "error",
+                message: "Email already exists"
+            });
+        }
+
+        if (error.message === "VALIDATION_ERROR") {
+            return res.status(422).json({
+                status: "error",
+                message: "Invalid input data"
+            });
+        }
+
+        if (error.message === "WEAK_PASSWORD") {
+            return res.status(422).json({
+                status: "error",
+                message: "Password is too weak"
+            });
+        }
+
+        return res.status(500).json({
+            status: "error",
+            message: "Internal server error"
+        });
     }
-    if (error.message === "VALIDATION_ERROR") {
-      return res.status(422).json({ status: "error", message: "Invalid input data", error: error.message });
-    }
-    if (error.message === "WEAK_PASSWORD") {
-      return res.status(422).json({ status: "error", message: "Password is too weak", error: error.message });
-    }
-    return res.status(500).json({ status: "error", message: "Internal server error", error: error.message });
-  }
 };
 
 

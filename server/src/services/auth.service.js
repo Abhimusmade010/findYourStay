@@ -4,46 +4,108 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 //Helper: shared logic for creating a user
+// const buildUser = async ({ name, email, password, role }) => {
+
+//   if (!name || !email || !password) {
+//     throw new Error("VALIDATION_ERROR");
+//   }
+
+//   // check if user with the same email already exists
+//   const existingUser = await User.findOne({ email });
+//   if (existingUser) {
+//     throw new Error("EMAIL_EXISTS");
+//   }
+
+//   // additional check for password strength (Zod middleware also validates, this is defense-in-depth)
+//   if (password.length < 6) {
+//     throw new Error("WEAK_PASSWORD");
+//   }
+
+//   // hash the password before saving to database
+//   // salting rounds of 10 adds random data so identical passwords produce different hashes
+//   const passwordHash = await bcrypt.hash(password, 10);
+
+//   const user = await User.create({
+//     name,
+//     email,
+//     passwordHash,
+//     role,
+//   });
+
+//   const token = jwt.sign(
+//     { userId: user._id, role: user.role },
+//     process.env.JWT_SECRET,
+//     { expiresIn: "24h" }
+//   );
+
+//   return {
+//     name: user.name,
+//     email: user.email,
+//     role: user.role,
+//     token,
+//   };
+// };
 const buildUser = async ({ name, email, password, role }) => {
 
-  if (!name || !email || !password) {
-    throw new Error("VALIDATION_ERROR");
-  }
+    console.log("1. buildUser started");
+    console.log("2. Role:", role);
+    console.log("3. JWT_SECRET exists:", !!process.env.JWT_SECRET);
 
-  // check if user with the same email already exists
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new Error("EMAIL_EXISTS");
-  }
+    if (!name || !email || !password) {
+        throw new Error("VALIDATION_ERROR");
+    }
 
-  // additional check for password strength (Zod middleware also validates, this is defense-in-depth)
-  if (password.length < 6) {
-    throw new Error("WEAK_PASSWORD");
-  }
+    console.log("4. Checking existing email");
 
-  // hash the password before saving to database
-  // salting rounds of 10 adds random data so identical passwords produce different hashes
-  const passwordHash = await bcrypt.hash(password, 10);
+    const existingUser = await User.findOne({ email });
 
-  const user = await User.create({
-    name,
-    email,
-    passwordHash,
-    role,
-  });
+    console.log("5. Existing user:", !!existingUser);
 
-  const token = jwt.sign(
-    { userId: user._id, role: user.role },
-    process.env.JWT_SECRET,
-    { expiresIn: "24h" }
-  );
+    if (existingUser) {
+        throw new Error("EMAIL_EXISTS");
+    }
 
-  return {
-    name: user.name,
-    email: user.email,
-    role: user.role,
-    token,
-  };
+    if (password.length < 6) {
+        throw new Error("WEAK_PASSWORD");
+    }
+
+    console.log("6. Hashing password");
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    console.log("7. Creating user");
+
+    const user = await User.create({
+        name,
+        email,
+        passwordHash,
+        role,
+    });
+
+    console.log("8. User created:", user._id);
+
+    console.log("9. Generating JWT");
+    console.log("JWT_SECRET exists:", !!process.env.JWT_SECRET);
+
+    const token = jwt.sign(
+        {
+            userId: user._id,
+            role: user.role
+        },
+        process.env.JWT_SECRET,
+        {
+            expiresIn: "24h"
+        }
+    );
+
+    console.log("10. JWT generated");
+
+    return {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        token,
+    };
 };
 
 //Public registration: role is always set to "Customer" server-side, client cannot specify it
