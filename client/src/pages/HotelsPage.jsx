@@ -352,7 +352,7 @@ export default function HotelsPage() {
                     <CardHeader className="pb-1 pt-4">
                       <CardTitle className="text-base leading-tight">{h.name}</CardTitle>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        📍 {h.location?.city}{h.location?.country ? `, ${h.location.country}` : ''}
+                         {h.location?.city}{h.location?.country ? `, ${h.location.country}` : ''}
                       </p>
                     </CardHeader>
 
