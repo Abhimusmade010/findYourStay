@@ -38,8 +38,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden">
       {/* Futuristic background layers */}
-      <div className="aurora-bg" />
-      <div className="grid-overlay" />
+      
+      {/* <div className="aurora-bg" />
+      <div className="grid-overlay" /> */}
 
       <Navigation />
       <main className="pt-16 min-h-[80vh] relative z-10">
