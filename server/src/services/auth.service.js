@@ -1,7 +1,7 @@
 
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs"; // Use bcryptjs for compatibility with Node.js 18
 
 //Helper: shared logic for creating a user
 // const buildUser = async ({ name, email, password, role }) => {
