@@ -168,18 +168,7 @@ export default function HotelsPage() {
                     onChange={e => setCity(e.target.value)}
                     className="text-sm"
                   />
-                  <Input
-                    placeholder="State"
-                    value={state}
-                    onChange={e => setState(e.target.value)}
-                    className="text-sm"
-                  />
-                  <Input
-                    placeholder="Country"
-                    value={country}
-                    onChange={e => setCountry(e.target.value)}
-                    className="text-sm"
-                  />
+                 
                 </div>
 
                 {/* Price range */}
@@ -222,7 +211,6 @@ export default function HotelsPage() {
 
                
 
-                
               </div>
             </aside>
           )}
@@ -361,3 +349,63 @@ export default function HotelsPage() {
 
     )
 }
+
+//  {/* Availability */}
+//                 <div className="space-y-2">
+//                   <p className="text-sm font-semibold">Availability</p>
+//                   <div className="flex gap-2">
+//                     {[
+//                       { label: 'All',       value: '' },
+//                       { label: 'Available', value: 'true' },
+//                       { label: 'Booked',    value: 'false' },
+//                     ].map(opt => (
+//                       <button
+//                         key={opt.value}
+//                         onClick={() => setAvailable(opt.value)}
+//                         className={`flex-1 py-1.5 rounded-md text-xs font-medium border transition
+//                           ${available === opt.value
+//                             ? 'bg-primary text-white border-primary'
+//                             : 'border-border/50 text-muted-foreground hover:border-primary/40'}`}
+//                       >
+//                         {opt.label}
+//                       </button>
+//                     ))}
+//                   </div>
+//                 </div>
+
+//                 {/* Amenities */}
+//                 <div className="space-y-2">
+//                   <p className="text-sm font-semibold">Amenities</p>
+//                   <div className="flex flex-wrap gap-1.5">
+//                     {AMENITY_OPTIONS.map(a => (
+//                       <button
+//                         key={a}
+//                         onClick={() => toggleAmenity(a)}
+//                         className={`px-2.5 py-1 rounded-full text-xs font-medium border transition
+//                           ${amenities.includes(a)
+//                             ? 'bg-primary text-white border-primary'
+//                             : 'border-border/50 text-muted-foreground hover:border-primary/40'}`}
+//                       >
+//                         {a}
+//                       </button>
+//                     ))}
+//                   </div>
+//                 </div>
+
+
+
+
+
+
+//  <Input
+//                     placeholder="State"
+//                     value={state}
+//                     onChange={e => setState(e.target.value)}
+//                     className="text-sm"
+//                   />
+//                   <Input
+//                     placeholder="Country"
+//                     value={country}
+//                     onChange={e => setCountry(e.target.value)}
+//                     className="text-sm"
+//                   />
