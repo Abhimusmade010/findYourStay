@@ -184,7 +184,7 @@ export default function HotelsPage() {
 
                 {/* Price range */}
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold">Price / night ($)</p>
+                  <p className="text-sm font-semibold">Price / night</p>
                   <div className="grid grid-cols-2 gap-2">
                     <Input
                       type="number"
@@ -221,7 +221,7 @@ export default function HotelsPage() {
                 </div>
 
                 {/* Availability */}
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <p className="text-sm font-semibold">Availability</p>
                   <div className="flex gap-2">
                     {[
@@ -260,7 +260,8 @@ export default function HotelsPage() {
                       </button>
                     ))}
                   </div>
-                </div>
+                </div> */}
+                
 
               </div>
             </aside>
